@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "core",
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -121,5 +122,14 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication', 
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -1,16 +1,29 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics 
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny 
 from django.db.models import Sum, Q 
-from .models import Transacao, Categoria, Conta
-from .serializers import TransacaoSerializer, CategoriaSerializer, ContaSerializer
+from django.contrib.auth.models import User 
 
+from .models import Transacao, Categoria, Conta
+from .serializers import (
+    TransacaoSerializer, 
+    CategoriaSerializer, 
+    ContaSerializer,
+    UserRegisterSerializer 
+)
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
         
         return obj.usuario == request.user
+
+class UserRegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
+    permission_classes = [AllowAny] 
+
 class CategoriaViewSet(viewsets.ModelViewSet):
     serializer_class = CategoriaSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwner] 

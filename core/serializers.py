@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Transacao, Categoria, Conta
+from django.contrib.auth.models import User
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,3 +36,18 @@ class TransacaoSerializer(serializers.ModelSerializer):
             'conta', 'conta_nome'  
         ]
         read_only_fields = ('usuario',)
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'password')
+        
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password']
+        )
+        return user
