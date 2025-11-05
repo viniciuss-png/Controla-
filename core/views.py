@@ -12,6 +12,7 @@ from .serializers import (
     ContaSerializer,
     UserRegisterSerializer 
 )
+from .autofill import automatizar_recebimentos_pede_meia
 
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -24,6 +25,11 @@ class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
     permission_classes = [AllowAny] 
+    def perform_create(self, serializer):
+        user = serializer.save() 
+        serie_aluno = user.perfilaluno.serie_em 
+        
+        automatizar_recebimentos_pede_meia(user, serie_aluno)
 
 class CategoriaViewSet(viewsets.ModelViewSet):
     serializer_class = CategoriaSerializer

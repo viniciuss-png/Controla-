@@ -1,6 +1,31 @@
 from rest_framework import serializers
 from .models import Transacao, Categoria, Conta
 from django.contrib.auth.models import User
+from .models import PerfilAluno
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    
+    serie_em = serializers.IntegerField(
+        write_only=True, 
+        min_value=1, 
+        max_value=3,
+        error_messages={'invalid': 'A série deve ser 1, 2 ou 3.'}
+    ) 
+
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'serie_em') 
+        extra_kwargs = {'password': {'write_only': True}}
+    
+    def create(self, validated_data):
+        serie_em = validated_data.pop('serie_em') 
+        user = User.objects.create_user(**validated_data)
+        
+        PerfilAluno.objects.create(
+            usuario=user,
+            serie_em=serie_em
+        )
+        return user
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,18 +61,3 @@ class TransacaoSerializer(serializers.ModelSerializer):
             'conta', 'conta_nome'  
         ]
         read_only_fields = ('usuario',)
-
-class UserRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'password')
-        
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data.get('email', ''),
-            password=validated_data['password']
-        )
-        return user

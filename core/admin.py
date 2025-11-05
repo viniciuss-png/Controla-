@@ -1,6 +1,8 @@
 from django.contrib import admin
 from .models import Categoria, Conta, Transacao 
 from django.contrib.auth.models import User  
+from.models import PerfilAluno
+admin.site.register(PerfilAluno)
 
 class UserOwnedModelAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):

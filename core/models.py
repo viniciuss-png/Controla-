@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User 
+from django.utils import timezone
 
 
 class Categoria(models.Model):
@@ -58,3 +59,23 @@ class Transacao(models.Model):
     class Meta:
         ordering = ['-data'] 
         verbose_name_plural = "Transações"
+
+class PerfilAluno(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    SERIE_CHOICES = [
+        (1, '1º Ano'), 
+        (2, '2º Ano'), 
+        (3, '3º Ano')
+    ]
+    serie_em = models.IntegerField(
+        choices=SERIE_CHOICES,
+        default=1,
+        verbose_name="Série do Ensino Médio"
+    )
+    
+    ano_registro = models.IntegerField(default=timezone.now().year)
+    concluiu = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Perfil de {self.usuario.username} - {self.get_serie_em_display()}"
