@@ -3,8 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
 from django.db.models import Sum, Q 
-from django.contrib.auth.models import User 
-
+from django.contrib.auth.models import User
+from django.utils.dateparse import parse_date 
 from .models import Transacao, Categoria, Conta
 from .serializers import (
     TransacaoSerializer, 
@@ -12,6 +12,7 @@ from .serializers import (
     ContaSerializer,
     UserRegisterSerializer 
 )
+
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
@@ -56,22 +57,32 @@ class TransacaoViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def resumo_financeiro(self, request):
+        from_date_str = request.query_params.get('from_date')
+        to_date_str = request.query_params.get('to_date')
+        filters = {'usuario': request.user}
+        
+        if from_date_str:
+            filters['data__gte'] = parse_date(from_date_str)
+
+        if to_date_str:
+            filters['data__lte'] = parse_date(to_date_str)
+
         total_entradas = Transacao.objects.filter(
-            usuario=request.user, 
+            **filters, 
             tipo='entrada', 
             pago=True
-        ).aggregate(Sum('valor'))['valor__sum'] or 0
+        ).aggregate(Sum('valor'))['valor__sum'] or 0.00
 
         total_saidas = Transacao.objects.filter(
-            usuario=request.user, 
+            **filters, 
             tipo='saida', 
             pago=True
-        ).aggregate(Sum('valor'))['valor__sum'] or 0
+        ).aggregate(Sum('valor'))['valor__sum'] or 0.00
 
         saldo_atual = total_entradas - total_saidas
         
         return Response({
-            'saldo_atual': saldo_atual,
-            'total_entradas': total_entradas,
-            'total_saidas': total_saidas
+            'saldo_atual': round(saldo_atual, 2), 
+            'total_entradas': round(total_entradas, 2),
+            'total_saidas': round(total_saidas, 2)
         })

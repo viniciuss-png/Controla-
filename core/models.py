@@ -21,7 +21,6 @@ class Categoria(models.Model):
         unique_together = ('nome', 'usuario')
         ordering = ['nome']
 
-
 class Conta(models.Model):
     nome = models.CharField(max_length=60)
     saldo_inicial = models.DecimalField(max_digits=10, decimal_places=2, default=0)
