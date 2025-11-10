@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Transacao, Categoria, Conta
 from django.contrib.auth.models import User
 from .models import PerfilAluno
+from .models import Transacao, Categoria, Conta, PerfilAluno, MetaFinanceira
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     
@@ -61,3 +62,26 @@ class TransacaoSerializer(serializers.ModelSerializer):
             'conta', 'conta_nome'  
         ]
         read_only_fields = ('usuario',)
+
+class MetaFinanceiraSerializer(serializers.ModelSerializer):
+    valor_atual = serializers.SerializerMethodField()
+    conta_nome = serializers.ReadOnlyField(source='conta_vinculada.nome') 
+    
+    class Meta:
+        model = MetaFinanceira
+        fields = [
+            'id', 
+            'nome', 
+            'valor_alvo', 
+            'data_alvo', 
+            'ativa',
+            'conta_vinculada', 
+            'conta_nome',      
+            'valor_atual',     
+        ]
+        read_only_fields = ('usuario',) 
+
+    def get_valor_atual(self, obj):
+        if obj.conta_vinculada:
+            return obj.conta_vinculada.saldo_inicial 
+        return 0.00

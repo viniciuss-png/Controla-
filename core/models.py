@@ -79,3 +79,26 @@ class PerfilAluno(models.Model):
 
     def __str__(self):
         return f"Perfil de {self.usuario.username} - {self.get_serie_em_display()}"
+    
+class MetaFinanceira(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    nome = models.CharField(max_length=100) 
+    valor_alvo = models.DecimalField(max_digits=10, decimal_places=2) 
+    conta_vinculada = models.OneToOneField(
+        Conta, 
+        on_delete=models.PROTECT, 
+        null=True, 
+        blank=True,
+        help_text="Conta separada onde o dinheiro desta meta será depositado."
+    )
+    
+    data_alvo = models.DateField(null=True, blank=True) 
+    ativa = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Meta: {self.nome} de {self.usuario.username}"
+        
+    class Meta:
+        verbose_name = "Meta Financeira"
+        verbose_name_plural = "Metas Financeiras"
+        ordering = ['data_alvo']

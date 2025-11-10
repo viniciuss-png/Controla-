@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from core.views import TransacaoViewSet, CategoriaViewSet, ContaViewSet,UserRegisterView
+from core.views import TransacaoViewSet, CategoriaViewSet, ContaViewSet,UserRegisterView, MetaFinanceiraViewSet
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -12,6 +12,7 @@ router = DefaultRouter()
 router.register(r'transacoes', TransacaoViewSet, basename='transacao')
 router.register(r'categorias', CategoriaViewSet, basename='categoria')
 router.register(r'contas', ContaViewSet, basename='conta')
+router.register(r'metas', MetaFinanceiraViewSet, basename='meta')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
