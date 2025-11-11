@@ -1,0 +1,87 @@
+body {
+    background-color: #94cc66;
+}
+
+.entrar-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 40px; 
+    box-sizing: border-box; 
+    text-align: center;
+    background-color: white;
+    border-radius: 10px;
+}
+
+.logomarca img {
+    max-width: 200px;
+    margin-bottom: 30px;
+}
+
+/* Campos de Email e Senha */
+.campo-de-texto {
+    margin-bottom: 15px;
+    display: flex;
+}
+
+.campo-de-texto input {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* Seleciona todos inputs e textarea na página */
+::placeholder {
+    color: #aaa;
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+/* Estilo base para AMBOS os botões */
+.botao {
+    display: block;
+    padding: 15px;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease;
+}
+
+/* Botão "Entrar" (Verde) */
+.botao-entrar {
+    background-color: var(--cor-principal);
+    color: white;
+}
+.botao-entrar:hover {
+    background-color: #294d0e;
+}
+
+/* Botão "Cadastrar" (Laranja) */
+.botao-cadastrar {
+    background-color: var(--cor-secundaria);
+    color: white;
+    width: 90%;
+    margin: 0 0 0 5%;
+}
+.botao-cadastrar:hover {
+    background-color: #d97f13;
+}
+
+/* Link "Esqueceu a senha?" */
+.esqueceu-a-senha {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+}
+.esqueceu-a-senha:hover {
+    text-decoration: underline;
+}
