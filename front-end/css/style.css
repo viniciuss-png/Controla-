@@ -1,0 +1,40 @@
+@import url(resets.css);
+:root {
+    --cor-principal:#6a9c40;
+    --cor-secundaria: #f7941d;
+}
+
+/* ======================================= */
+/* 1. ESTILOS GLOBAIS (Mobile-First)       */
+/* ======================================= */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* ======================================= */
+/* 2. ESTILOS DESKTOP (Media Query)        */
+/* ======================================= */
+
+/* Estes estilos só serão aplicados se a tela tiver
+  PELO MENOS 768px de largura (tablets e desktops).
+*/
+@media (min-width: 768px) {
+
+    body { 
+        /* E centralizamos o card verticalmente */
+        align-items: center; 
+        padding-top: 0; /* Remove o padding do topo */
+    }
+}
