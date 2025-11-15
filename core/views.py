@@ -170,6 +170,33 @@ class TransacaoViewSet(viewsets.ModelViewSet):
             'total_entradas': round(total_entradas, 2),
             'total_saidas': round(total_saidas, 2)
         })
+        
+    @action(detail=False, methods=['post'])
+    @transaction.atomic
+    def confirmar_recebimento(self, request):
+        user = request.user
+        hoje = timezone.localdate()
+        transacao_a_promover = Transacao.objects.filter(
+            usuario=user,
+            pago=False,
+            tipo='entrada',
+            data__lte=hoje, 
+            descricao__startswith='Pé-de-Meia: Frequência'
+        ).order_by('data').first() 
+
+        if not transacao_a_promover:
+            return Response(
+                {"detail": "Nenhuma parcela de Pé-de-Meia pendente ou com data de pagamento atingida para confirmação."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        transacao_a_promover.pago = True
+        transacao_a_promover.save()
+
+        return Response(
+            {"detail": f"Recebimento de R$ {transacao_a_promover.valor:.2f} (Pé-de-Meia) confirmado com sucesso! Saldo atualizado."},
+            status=status.HTTP_200_OK
+        )
     
 class MetaFinanceiraViewSet(viewsets.ModelViewSet):
     serializer_class = MetaFinanceiraSerializer
@@ -205,4 +232,4 @@ class MetaFinanceiraViewSet(viewsets.ModelViewSet):
             'valor_atual': valor_atual,
             'falta_atingir': round(falta, 2),
             'percentual_atingido': round(percentual, 2),
-        })
+        }) 

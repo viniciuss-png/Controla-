@@ -51,7 +51,7 @@ def automatizar_recebimentos_pede_meia(user, serie_aluno):
                 valor=VALOR_MENSAL,
                 data=data_efetiva,
                 descricao=f"Pé-de-Meia: Frequência - {data_efetiva.strftime('%B/%Y')}",
-                pago=True 
+                pago=False
             )
             
     return True
