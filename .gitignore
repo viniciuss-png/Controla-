@@ -10,3 +10,4 @@ db.sqlite3
 /static
 .vscode/
 Controlaê Testes e Anotações.txt
+.envs
