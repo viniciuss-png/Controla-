@@ -1,7 +1,3 @@
-"""
-Suite de testes para aplicação Controlaê
-Cobre autenticação, permissões, CRUD, e operações críticas
-"""
 import pytest
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -17,14 +13,8 @@ from core.models import (
 )
 from core.services import transferir_saldo, depositar_em_meta
 
-
-# ============================================================================
-# FIXTURES E FACTORIES
-# ============================================================================
-
 @pytest.fixture
 def user_factory():
-    """Factory para criar usuários de teste com nomes únicos"""
     counter = {"value": 0}
     def create_user(username=None, password="testpass123"):
         if username is None:
@@ -42,29 +32,21 @@ def user_factory():
 
 @pytest.fixture
 def api_client():
-    """Client API com suporte a autenticação"""
     return APIClient()
 
 
 @pytest.fixture
 def user_authenticated(user_factory, api_client):
-    """Usuário criado e autenticado"""
     user = user_factory()
     refresh = RefreshToken.for_user(user)
     api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
     return user, api_client
 
 
-# ============================================================================
-# TESTES DE AUTENTICAÇÃO E REGISTRO
-# ============================================================================
-
 @pytest.mark.django_db
 class TestUserRegistration:
-    """Testes para registro de usuários"""
     
     def test_user_registration_success(self, api_client):
-        """Registro de usuário bem-sucedido cria usuário e perfil"""
         data = {
             "username": "newuser123",
             "password": "securepass123",
@@ -79,17 +61,14 @@ class TestUserRegistration:
         assert perfil.serie_em == 1
     
     def test_user_registration_missing_fields(self, api_client):
-        """Registro falha sem campos obrigatórios"""
         data = {
             "username": "incompleteuser"
-            # faltam email, password, first_name, last_name
         }
         
         response = api_client.post('/api/register/', data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
     
     def test_user_registration_duplicate_username(self, api_client, user_factory):
-        """Não permite criar usuário com username duplicado"""
         user_factory(username="existing")
         
         data = {
@@ -104,7 +83,6 @@ class TestUserRegistration:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
     
     def test_perfil_aluno_created_automatically(self, user_factory):
-        """PerfilAluno é criado automaticamente ao criar usuário"""
         user = user_factory()
         
         perfil = PerfilAluno.objects.get(usuario=user)
@@ -115,10 +93,8 @@ class TestUserRegistration:
 
 @pytest.mark.django_db
 class TestJWTAuthentication:
-    """Testes para autenticação JWT"""
     
     def test_token_obtain(self, user_factory, api_client):
-        """Obter token JWT com credenciais corretas"""
         user = user_factory(username="testuser", password="testpass123")
         
         data = {"username": "testuser", "password": "testpass123"}
@@ -129,7 +105,6 @@ class TestJWTAuthentication:
         assert "refresh" in response.data
     
     def test_token_invalid_credentials(self, user_factory, api_client):
-        """Falha ao obter token com credenciais incorretas"""
         user_factory(username="testuser", password="testpass123")
         
         data = {"username": "testuser", "password": "wrongpassword"}
@@ -138,28 +113,22 @@ class TestJWTAuthentication:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
     def test_access_protected_endpoint_with_token(self, user_authenticated):
-        """Acesso permitido a endpoint protegido com token válido"""
         user, api_client = user_authenticated
         
         response = api_client.get('/api/transacoes/')
         assert response.status_code == status.HTTP_200_OK
     
     def test_access_protected_endpoint_without_token(self, api_client):
-        """Acesso negado a endpoint protegido sem token"""
         response = api_client.get('/api/transacoes/')
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-# ============================================================================
-# TESTES DE CATEGORIAS
-# ============================================================================
-
 @pytest.mark.django_db
 class TestCategoriaViewSet:
-    """Testes para CRUD de categorias"""
     
     def test_criar_categoria(self, user_authenticated):
-        """Usuário pode criar categoria"""
+        user, api_client = user_authenticated
+        
         user, api_client = user_authenticated
         
         data = {
@@ -172,19 +141,14 @@ class TestCategoriaViewSet:
         assert Categoria.objects.filter(nome="Alimentação", usuario=user).exists()
     
     def test_categoria_unique_por_usuario(self, user_authenticated, user_factory, api_client):
-        """Não permite categoria duplicada para mesmo usuário"""
         user, api_client = user_authenticated
         
-        # Criar primeira categoria
         data = {"nome": "Transporte", "tipo_categoria": "saida"}
         api_client.post('/api/categorias/', data)
-        
-        # Tentar criar duplicada
         response = api_client.post('/api/categorias/', data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
     
     def test_categoria_mesmo_nome_usuarios_diferentes(self, user_factory, api_client):
-        """Usuários diferentes podem ter categorias com mesmo nome"""
         user1 = user_factory(username="user1")
         user2 = user_factory(username="user2")
         
@@ -194,7 +158,6 @@ class TestCategoriaViewSet:
             usuario=user1
         )
         
-        # Mesmo nome, usuário diferente = OK
         cat2 = Categoria.objects.create(
             nome="Saúde",
             tipo_categoria="saida",
@@ -204,7 +167,6 @@ class TestCategoriaViewSet:
         assert cat2.id != 1
     
     def test_listar_categorias_isoladas_por_usuario(self, user_factory, api_client):
-        """Usuário só vê suas próprias categorias"""
         user1 = user_factory(username="user1")
         user2 = user_factory(username="user2")
         
@@ -220,16 +182,11 @@ class TestCategoriaViewSet:
         assert response.data[0]['nome'] == "Cat1"
 
 
-# ============================================================================
-# TESTES DE CONTAS
-# ============================================================================
-
 @pytest.mark.django_db
 class TestContaViewSet:
-    """Testes para CRUD de contas"""
     
     def test_criar_conta(self, user_authenticated):
-        """Usuário pode criar conta"""
+        user, api_client = user_authenticated
         user, api_client = user_authenticated
         
         data = {
@@ -242,7 +199,6 @@ class TestContaViewSet:
         assert Conta.objects.filter(nome="Conta Corrente", usuario=user).exists()
     
     def test_saldo_inicial_persistido(self, user_factory):
-        """Saldo inicial é armazenado corretamente"""
         user = user_factory()
         
         conta = Conta.objects.create(
@@ -254,7 +210,6 @@ class TestContaViewSet:
         assert conta.saldo_inicial == Decimal("500.50")
     
     def test_conta_isolada_por_usuario(self, user_factory, api_client):
-        """Usuário só pode acessar suas próprias contas"""
         user1 = user_factory(username="user1")
         user2 = user_factory(username="user2")
         
@@ -268,18 +223,11 @@ class TestContaViewSet:
         assert len(response.data) == 1
         assert response.data[0]['nome'] == "Conta1"
 
-
-# ============================================================================
-# TESTES DE TRANSAÇÕES
-# ============================================================================
-
 @pytest.mark.django_db
 class TestTransacaoViewSet:
-    """Testes para CRUD e operações de transações"""
     
     @pytest.fixture
     def transacao_setup(self, user_factory):
-        """Setup: usuário com conta e categoria"""
         user = user_factory()
         categoria = Categoria.objects.create(
             nome="Alimentação",
@@ -294,10 +242,8 @@ class TestTransacaoViewSet:
         return user, categoria, conta, user_factory
     
     def test_criar_transacao(self, transacao_setup, api_client):
-        """Usuário pode criar transação"""
         user, cat, conta, _ = transacao_setup
         
-        # Autenticar com o mesmo usuário
         refresh = RefreshToken.for_user(user)
         api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
         
@@ -314,7 +260,6 @@ class TestTransacaoViewSet:
         assert response.status_code == status.HTTP_201_CREATED
     
     def test_transacao_categoria_outro_usuario(self, user_factory, api_client):
-        """Não permite usar categoria de outro usuário"""
         user1 = user_factory(username="user1")
         user2 = user_factory(username="user2")
         
@@ -340,7 +285,6 @@ class TestTransacaoViewSet:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
     
     def test_transacao_isolada_por_usuario(self, user_factory, api_client):
-        """Usuário só vê suas próprias transações"""
         user1 = user_factory(username="user1")
         user2 = user_factory(username="user2")
         
@@ -364,17 +308,11 @@ class TestTransacaoViewSet:
         assert len(response.data) == 0
 
 
-# ============================================================================
-# TESTES DE METAS FINANCEIRAS
-# ============================================================================
-
 @pytest.mark.django_db
 class TestMetaFinanceiraViewSet:
-    """Testes para CRUD e operações de metas"""
     
     @pytest.fixture
     def meta_setup(self, user_factory):
-        """Setup: usuário com conta para meta"""
         user = user_factory()
         conta = Conta.objects.create(
             nome="Poupança Meta",
@@ -384,7 +322,6 @@ class TestMetaFinanceiraViewSet:
         return user, conta
     
     def test_criar_meta(self, meta_setup, user_authenticated):
-        """Usuário pode criar meta financeira"""
         user, conta = meta_setup
         _, api_client = user_authenticated
         
@@ -399,7 +336,6 @@ class TestMetaFinanceiraViewSet:
         assert response.status_code == status.HTTP_201_CREATED
     
     def test_meta_isolada_por_usuario(self, user_factory, api_client):
-        """Usuário só vê suas próprias metas"""
         user1 = user_factory(username="user1")
         user2 = user_factory(username="user2")
         
@@ -417,17 +353,10 @@ class TestMetaFinanceiraViewSet:
         response = api_client.get('/api/metas/')
         assert len(response.data) == 0
 
-
-# ============================================================================
-# TESTES DE SERVIÇOS CRÍTICOS (OPERAÇÕES ATÔMICAS)
-# ============================================================================
-
 @pytest.mark.django_db
 class TestServicesTransacciones:
-    """Testes para garantir atomicidade de operações críticas"""
     
     def test_transferir_saldo_atomico(self, user_factory):
-        """Transferência é atômica: débito + crédito"""
         user = user_factory()
         
         conta_origem = Conta.objects.create(
@@ -447,15 +376,13 @@ class TestServicesTransacciones:
             usuario=user
         )
         
-        # Transferir (assinatura: usuario, origem, destino, valor com float)
         transferir_saldo(
             usuario=user,
             origem=conta_origem,
             destino=conta_destino,
-            valor=500.00  # float é OK, função converte
+            valor=500.00  
         )
         
-        # Verificar transações criadas
         transacoes = Transacao.objects.all()
         assert transacoes.count() == 2
         
@@ -466,7 +393,6 @@ class TestServicesTransacciones:
         assert entrada.valor == Decimal("500.00")
     
     def test_depositar_em_meta_atomico(self, user_factory):
-        """Depósito em meta é atômico"""
         user = user_factory()
         
         conta = Conta.objects.create(
@@ -488,29 +414,20 @@ class TestServicesTransacciones:
             usuario=user
         )
         
-        # Depositar (assinatura: usuario, meta, valor com float)
         depositar_em_meta(
             usuario=user,
             meta=meta,
-            valor=200.00  # float é OK, função converte
+            valor=200.00  
         )
         
-        # Verificar transação criada
         transacao = Transacao.objects.filter(conta=conta, tipo="entrada").first()
         assert transacao is not None
         assert transacao.valor == Decimal("200.00")
 
-
-# ============================================================================
-# TESTES DE VALIDAÇÕES
-# ============================================================================
-
 @pytest.mark.django_db
 class TestValidacoes:
-    """Testes para validações de negócio"""
     
     def test_transacao_descricao_obrigatoria(self, user_factory, api_client):
-        """Transação requer descrição"""
         user = user_factory()
         cat = Categoria.objects.create(usuario=user)
         conta = Conta.objects.create(usuario=user)
@@ -522,7 +439,6 @@ class TestValidacoes:
             "categoria": cat.id,
             "conta": conta.id,
             "tipo": "saida",
-            # falta descricao
             "valor": "10.00",
             "data": date.today().isoformat()
         }
@@ -531,7 +447,6 @@ class TestValidacoes:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
     
     def test_transacao_valor_positivo(self, user_factory):
-        """Valor de transação deve ser positivo (validação clean)"""
         user = user_factory()
         cat = Categoria.objects.create(usuario=user)
         conta = Conta.objects.create(usuario=user)
@@ -546,13 +461,11 @@ class TestValidacoes:
             data=date.today()
         )
         
-        # Clean() deve lançar ValidationError para valores negativos
         from django.core.exceptions import ValidationError as DjangoValidationError
         with pytest.raises(DjangoValidationError):
             transacao.full_clean()
     
     def test_meta_valor_alvo_positivo(self, user_factory):
-        """Meta deve ter valor alvo positivo"""
         user = user_factory()
         conta = Conta.objects.create(usuario=user)
         

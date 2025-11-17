@@ -5,7 +5,7 @@ from decimal import Decimal
 
 @transaction.atomic
 def transferir_saldo(usuario, origem: Conta, destino: Conta, valor: float):
-    valor = Decimal(str(valor))  # Converter para Decimal para evitar problemas de ponto flutuante
+    valor = Decimal(str(valor))   
     origem.saldo_inicial -= valor
     destino.saldo_inicial += valor
     origem.save()
@@ -49,7 +49,7 @@ def transferir_saldo(usuario, origem: Conta, destino: Conta, valor: float):
 
 @transaction.atomic
 def depositar_em_meta(usuario, meta, valor: float):
-    valor = Decimal(str(valor))  # Converter para Decimal
+    valor = Decimal(str(valor))  
     
     conta_principal = Conta.objects.filter(usuario=usuario).order_by('id').first()
     if not conta_principal:
