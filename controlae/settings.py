@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "core",
     'rest_framework_simplejwt',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +133,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -148,3 +150,28 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# drf-spectacular (Swagger/OpenAPI) Configuration
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Controlaê API',
+    'DESCRIPTION': 'API de gestão financeira para alunos com Pé-de-Meia',
+    'VERSION': '1.0.0',
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
+    'SERVERS': [
+        {
+            'url': 'http://localhost:8000',
+            'description': 'Local Development'
+        },
+        {
+            'url': 'https://api.controlae.com',
+            'description': 'Production'
+        }
+    ],
+    'CONTACT': {
+        'name': 'Vinicius - Backend Developer',
+        'email': 'vinicius@example.com'
+    },
+    'LICENSE': {
+        'name': 'MIT'
+    }
+}

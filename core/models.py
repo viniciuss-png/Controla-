@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User 
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 
 class Categoria(models.Model):
@@ -55,6 +56,10 @@ class Transacao(models.Model):
 
     def __str__(self):
         return f"{self.tipo.upper()} - {self.descricao} - R$ {self.valor}"
+    
+    def clean(self):
+        if self.valor <= 0:
+            raise ValidationError("Valor da transação deve ser positivo")
 
     class Meta:
         ordering = ['-data'] 
@@ -97,6 +102,10 @@ class MetaFinanceira(models.Model):
 
     def __str__(self):
         return f"Meta: {self.nome} de {self.usuario.username}"
+    
+    def clean(self):
+        if self.valor_alvo <= 0:
+            raise ValidationError("Valor alvo da meta deve ser positivo")
         
     class Meta:
         verbose_name = "Meta Financeira"
