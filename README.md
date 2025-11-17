@@ -8,7 +8,7 @@
 
 **Controlaê** é uma plataforma de gestão financeira desenvolvida para alunos do ensino médio que recebem o benefício **Pé-de-Meia**. O sistema permite que os beneficiários rastreiem receitas, despesas, contas bancárias e metas de poupança.
 
-## 📋 Índice
+# Índice
 
 - [Visão Geral](#visão-geral)
 - [Tecnologias](#tecnologias)
@@ -25,27 +25,27 @@
 
 ---
 
-## 🎯 Visão Geral
+# Visão Geral
 
-### Problema Resolvido
+# Problema Resolvido
 Alunos do ensino médio que recebem o Pé-de-Meia (benefício governamental) precisam de ferramentas simples e seguras para:
 - Registrar entradas (Pé-de-Meia, bolsas, mesada)
 - Categorizar despesas
 - Gerenciar múltiplas contas
 - Rastrear metas de poupança
 
-### Funcionalidades Principais
-✅ **Autenticação JWT** - Segura e escalável  
-✅ **Isolamento de Dados** - Cada usuário vê apenas seus dados  
-✅ **CRUD Completo** - Categorias, Contas, Transações, Metas  
-✅ **Transações Atômicas** - Transferências e depósitos garantem integridade  
-✅ **Validações Robustas** - Campos obrigatórios, valores positivos, isolamento por usuário  
-✅ **Testes Automatizados** - 25 testes com 76% de cobertura  
-✅ **CORS Configurado** - Frontend e backend rodando em portas diferentes  
+# Funcionalidades Principais
+ **Autenticação JWT** - Segura e escalável  
+ **Isolamento de Dados** - Cada usuário vê apenas seus dados  
+ **CRUD Completo** - Categorias, Contas, Transações, Metas  
+ **Transações Atômicas** - Transferências e depósitos garantem integridade  
+ **Validações Robustas** - Campos obrigatórios, valores positivos, isolamento por usuário  
+ **Testes Automatizados** - 25 testes com 76% de cobertura  
+ **CORS Configurado** - Frontend e backend rodando em portas diferentes  
 
 ---
 
-## 🛠 Tecnologias
+# Tecnologias
 
 | Tecnologia | Versão | Propósito |
 |-----------|--------|----------|
@@ -60,39 +60,34 @@ Alunos do ensino médio que recebem o Pé-de-Meia (benefício governamental) pre
 
 ---
 
-## 🚀 Instalação e Setup
+# Instalação e Setup
 
-### Pré-requisitos
+# Pré-requisitos
 - Python 3.13+
 - pip (gerenciador de pacotes Python)
 - Git
 
-### 1. Clonar o Repositório
+# 1. Clonar o Repositório
 
 ```bash
 git clone https://github.com/seu-usuario/Backend_Controlae.git
 cd Backend_Controlae
 ```
 
-### 2. Criar Virtual Environment
+# 2. Criar Virtual Environment
 
 ```bash
 # Windows
 python -m venv venv
 venv\Scripts\activate
 
-# macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Instalar Dependências
+# 3. Instalar Dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configurar Variáveis de Ambiente
+# 4. Configurar Variáveis de Ambiente
 
 Criar arquivo `.env` na raiz do projeto:
 
@@ -114,19 +109,19 @@ JWT_EXPIRATION_HOURS=24
 CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:8080
 ```
 
-### 5. Executar Migrações
+# 5. Executar Migrações
 
 ```bash
 python manage.py migrate
 ```
 
-### 6. Criar Superusuário (Opcional)
+# 6. Criar Superusuário (Opcional)
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### 7. Iniciar Servidor
+# 7. Iniciar Servidor
 
 ```bash
 python manage.py runserver
@@ -136,9 +131,9 @@ O servidor estará disponível em: `http://127.0.0.1:8000/`
 
 ---
 
-## ⚙️ Configuração
+# Configuração
 
-### Estrutura de Diretórios
+# Estrutura de Diretórios
 
 ```
 Backend_Controlae/
@@ -164,7 +159,7 @@ Backend_Controlae/
 └── .env                       # Variáveis de ambiente (não versionado)
 ```
 
-### Variáveis de Ambiente Importantes
+# Variáveis de Ambiente Importantes
 
 | Variável | Padrão | Descrição |
 |----------|--------|-----------|
@@ -175,11 +170,11 @@ Backend_Controlae/
 
 ---
 
-## 📊 Estrutura do Projeto
+# Estrutura do Projeto
 
-### Modelos de Dados
+# Modelos de Dados
 
-#### 1. **User** (Django built-in)
+# 1. **User** (Django built-in)
 ```python
 {
   "id": 1,
@@ -190,7 +185,7 @@ Backend_Controlae/
 }
 ```
 
-#### 2. **PerfilAluno** (Perfil do Aluno)
+# 2. **PerfilAluno** (Perfil do Aluno)
 ```python
 {
   "usuario": 1,
@@ -200,7 +195,7 @@ Backend_Controlae/
 }
 ```
 
-#### 3. **Categoria** (Categorização de Transações)
+# 3. **Categoria** (Categorização de Transações)
 ```python
 {
   "id": 1,
@@ -210,7 +205,7 @@ Backend_Controlae/
 }
 ```
 
-#### 4. **Conta** (Contas Bancárias)
+# 4. **Conta** (Contas Bancárias)
 ```python
 {
   "id": 1,
@@ -220,7 +215,7 @@ Backend_Controlae/
 }
 ```
 
-#### 5. **Transacao** (Transações Financeiras)
+# 5. **Transacao** (Transações Financeiras)
 ```python
 {
   "id": 1,
@@ -237,7 +232,7 @@ Backend_Controlae/
 }
 ```
 
-#### 6. **MetaFinanceira** (Metas de Poupança)
+# 6. **MetaFinanceira** (Metas de Poupança)
 ```python
 {
   "id": 1,
@@ -247,17 +242,17 @@ Backend_Controlae/
   "conta_vinculada": 2,
   "data_alvo": "2024-12-20",
   "ativa": true,
-  "valor_atual": 450.00  # Calculado automaticamente
+  "valor_atual": 450.00 
 }
 ```
 
 ---
 
-## 🔌 API Endpoints
+# API Endpoints
 
-### 📝 Autenticação
+# Autenticação
 
-#### Registrar Novo Usuário
+# Registrar Novo Usuário
 ```
 POST /api/register/
 Content-Type: application/json
@@ -275,7 +270,7 @@ Response: 201 Created
 }
 ```
 
-#### Obter Token JWT
+# Obter Token JWT
 ```
 POST /api/token/
 Content-Type: application/json
@@ -292,7 +287,7 @@ Response: 200 OK
 }
 ```
 
-#### Renovar Token
+# Renovar Token
 ```
 POST /api/token/refresh/
 Content-Type: application/json
@@ -307,9 +302,9 @@ Response: 200 OK
 }
 ```
 
-### 💰 Categorias
+# Categorias
 
-#### Listar Categorias
+## Listar Categorias
 ```
 GET /api/categorias/
 Authorization: Bearer {access_token}
@@ -329,7 +324,7 @@ Response: 200 OK
 ]
 ```
 
-#### Criar Categoria
+# Criar Categoria
 ```
 POST /api/categorias/
 Authorization: Bearer {access_token}
@@ -343,7 +338,7 @@ Content-Type: application/json
 Response: 201 Created
 ```
 
-#### Atualizar Categoria
+# Atualizar Categoria
 ```
 PUT /api/categorias/{id}/
 Authorization: Bearer {access_token}
@@ -357,7 +352,7 @@ Content-Type: application/json
 Response: 200 OK
 ```
 
-#### Deletar Categoria
+# Deletar Categoria
 ```
 DELETE /api/categorias/{id}/
 Authorization: Bearer {access_token}
@@ -365,9 +360,9 @@ Authorization: Bearer {access_token}
 Response: 204 No Content
 ```
 
-### 🏦 Contas
+# Contas
 
-#### Listar Contas
+# Listar Contas
 ```
 GET /api/contas/
 Authorization: Bearer {access_token}
@@ -382,7 +377,7 @@ Response: 200 OK
 ]
 ```
 
-#### Criar Conta
+# Criar Conta
 ```
 POST /api/contas/
 Authorization: Bearer {access_token}
@@ -396,7 +391,7 @@ Content-Type: application/json
 Response: 201 Created
 ```
 
-#### Transferir Entre Contas
+# Transferir Entre Contas
 ```
 POST /api/contas/{id}/transferir/
 Authorization: Bearer {access_token}
@@ -413,9 +408,9 @@ Response: 200 OK
 }
 ```
 
-### 💳 Transações
+# Transações
 
-#### Listar Transações
+# Listar Transações
 ```
 GET /api/transacoes/
 Authorization: Bearer {access_token}
@@ -435,7 +430,7 @@ Response: 200 OK
 ]
 ```
 
-#### Criar Transação
+# Criar Transação
 ```
 POST /api/transacoes/
 Authorization: Bearer {access_token}
@@ -455,7 +450,7 @@ Content-Type: application/json
 Response: 201 Created
 ```
 
-#### Resumo Financeiro
+# Resumo Financeiro
 ```
 GET /api/transacoes/resumo_financeiro/?from_date=2024-01-01&to_date=2024-01-31
 Authorization: Bearer {access_token}
@@ -473,7 +468,7 @@ Response: 200 OK
 }
 ```
 
-#### Confirmar Recebimento Pé-de-Meia
+# Confirmar Recebimento Pé-de-Meia
 ```
 POST /api/transacoes/confirmar_recebimento/?mes=1&ano=2024
 Authorization: Bearer {access_token}
@@ -484,9 +479,9 @@ Response: 200 OK
 }
 ```
 
-### 🎯 Metas Financeiras
+# Metas Financeiras
 
-#### Listar Metas
+# Listar Metas
 ```
 GET /api/metas/
 Authorization: Bearer {access_token}
@@ -505,7 +500,7 @@ Response: 200 OK
 ]
 ```
 
-#### Criar Meta
+# Criar Meta
 ```
 POST /api/metas/
 Authorization: Bearer {access_token}
@@ -521,7 +516,7 @@ Content-Type: application/json
 Response: 201 Created
 ```
 
-#### Progresso da Meta
+# Progresso da Meta
 ```
 GET /api/metas/{id}/progresso/
 Authorization: Bearer {access_token}
@@ -536,7 +531,7 @@ Response: 200 OK
 }
 ```
 
-#### Depositar em Meta
+# Depositar em Meta
 ```
 POST /api/metas/{id}/depositar/
 Authorization: Bearer {access_token}
@@ -554,20 +549,20 @@ Response: 200 OK
 
 ---
 
-## 🔐 Autenticação
+# Autenticação
 
-### Token JWT
+# Token JWT
 
 O Controlaê usa **JWT (JSON Web Tokens)** para autenticação segura.
 
-#### Fluxo de Autenticação
+# Fluxo de Autenticação
 
 1. **Registrar**: `POST /api/register/` → Cria novo usuário
 2. **Obter Token**: `POST /api/token/` → Retorna access + refresh tokens
 3. **Usar Token**: Adicionar header `Authorization: Bearer {access_token}` em requisições
 4. **Renovar**: `POST /api/token/refresh/` → Novo access token
 
-#### Headers Necessários
+# Headers Necessários
 
 ```javascript
 headers: {
@@ -576,17 +571,17 @@ headers: {
 }
 ```
 
-### Permissões
+# Permissões
 
-- ✅ **IsAuthenticated**: Requer token válido
-- ✅ **IsOwner**: Requer que o recurso pertença ao usuário
-- ✅ **AllowAny**: Registro e token sem autenticação
+-  **IsAuthenticated**: Requer token válido
+-  **IsOwner**: Requer que o recurso pertença ao usuário
+-  **AllowAny**: Registro e token sem autenticação
 
 ---
 
-## 📚 Exemplos de Uso
+# Exemplos de Uso
 
-### JavaScript/Fetch API
+# JavaScript/Fetch API
 
 ```javascript
 // 1. Registrar
@@ -638,7 +633,7 @@ const createTransacao = async (accessToken, dados) => {
 };
 ```
 
-### Python/Requests
+# Python/Requests
 
 ```python
 import requests
@@ -679,15 +674,15 @@ response = requests.post(f'{BASE_URL}/transacoes/', json=data, headers=headers)
 
 ---
 
-## 🧪 Testes
+# Testes
 
-### Executar Todos os Testes
+# Executar Todos os Testes
 
 ```bash
 pytest
 ```
 
-### Executar Testes com Cobertura
+# Executar Testes com Cobertura
 
 ```bash
 pytest --cov=core --cov-report=html
@@ -695,13 +690,13 @@ pytest --cov=core --cov-report=html
 
 Relatório de cobertura será gerado em `htmlcov/index.html`
 
-### Executar Teste Específico
+# Executar Teste Específico
 
 ```bash
 pytest core/tests.py::TestUserRegistration::test_user_registration_success -v
 ```
 
-### Estrutura de Testes
+# Estrutura de Testes
 
 ```
 core/tests.py
@@ -723,13 +718,13 @@ core/tests.py
 └── TestValidacoes (3 testes)
 ```
 
-**Total: 25 testes | Cobertura: 76%**
+**Total: 25 testes**
 
 ---
 
-## 💾 Banco de Dados
+# Banco de Dados
 
-### Migrações
+# Migrações
 
 ```bash
 # Ver status de migrações
@@ -745,7 +740,7 @@ python manage.py makemigrations
 python manage.py migrate core 0003
 ```
 
-### Criar Dados de Teste
+# Criar Dados de Teste
 
 ```bash
 python manage.py shell
@@ -790,49 +785,32 @@ transacao = Transacao.objects.create(
 
 ---
 
-## 🔒 Segurança
+# Segurança
 
-### Boas Práticas Implementadas
+# Boas Práticas Implementadas
 
-✅ **Variáveis de Ambiente** - Senhas/chaves não no código  
-✅ **JWT Tokens** - Autenticação stateless e escalável  
-✅ **CORS Restrito** - Apenas localhost por padrão  
-✅ **Validação de Dados** - Serializers validam entrada  
-✅ **Isolamento de Dados** - Permissões por usuário  
-✅ **Transações Atômicas** - Integridade em operações críticas  
-✅ **HTTPS Pronto** - Configurável via settings  
+ **Variáveis de Ambiente** - Senhas/chaves não no código  
+ **JWT Tokens** - Autenticação stateless e escalável  
+ **CORS Restrito** - Apenas localhost por padrão  
+ **Validação de Dados** - Serializers validam entrada  
+ **Isolamento de Dados** - Permissões por usuário  
+ **Transações Atômicas** - Integridade em operações críticas  
+ **HTTPS Pronto** - Configurável via settings  
 
-### Checklist de Segurança para Produção
+# Troubleshooting
 
-- [ ] Mudar `DEBUG=False` em `.env`
-- [ ] Gerar nova `SECRET_KEY` robusta
-- [ ] Configurar `ALLOWED_HOSTS` com domínio real
-- [ ] Usar banco PostgreSQL ao invés SQLite
-- [ ] Configurar HTTPS/SSL
-- [ ] Adicionar rate limiting
-- [ ] Backup automático do BD
-- [ ] Monitorar logs de erro
-- [ ] Usar gerenciador de secrets (AWS Secrets Manager, etc)
-
----
-
-## 🆘 Troubleshooting
-
-### Erro: `ModuleNotFoundError: No module named 'django'`
+# Erro: `ModuleNotFoundError: No module named 'django'`
 
 ```bash
 # Solução: Ativar virtual environment
 # Windows:
 venv\Scripts\activate
 
-# macOS/Linux:
-source venv/bin/activate
-
 # Depois instalar:
 pip install -r requirements.txt
 ```
 
-### Erro: `CORS error` no Frontend
+# Erro: `CORS error` no Frontend
 
 ```python
 # Verificar CORS_ALLOWED_ORIGINS em settings.py
@@ -846,7 +824,7 @@ CORS_ALLOWED_ORIGINS = [
 # e CorsMiddleware está no topo de MIDDLEWARE
 ```
 
-### Erro: `Permissão negada` ao criar recurso
+# Erro: `Permissão negada` ao criar recurso
 
 ```python
 # Verificar se usuario foi atribuído corretamente
@@ -855,14 +833,14 @@ def perform_create(self, serializer):
     serializer.save(usuario=self.request.user)
 ```
 
-### Erro: `ProgrammingError: table does not exist`
+# Erro: `ProgrammingError: table does not exist`
 
 ```bash
 # Solução: Rodar migrações
 python manage.py migrate
 ```
 
-### Erro: `UNIQUE constraint failed`
+# Erro: `UNIQUE constraint failed`
 
 ```python
 # Verificar validação de unicidade
@@ -877,20 +855,11 @@ def validate_nome(self, value):
 
 ---
 
-## 📞 Suporte e Contribuição
+# Suporte e Contribuição
 
-### Reportar Bugs
+# Reportar Bugs
 ```
 GitHub Issues: https://github.com/seu-usuario/Backend_Controlae/issues
-```
-
-### Contribuir
-```
-1. Fork o repositório
-2. Criar branch de feature (`git checkout -b feature/AmazingFeature`)
-3. Commit das mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abrir Pull Request
 ```
 
 ### Roadmap Futuro
@@ -903,15 +872,9 @@ GitHub Issues: https://github.com/seu-usuario/Backend_Controlae/issues
 
 ---
 
-## 📄 Licença
+# Autor
 
-Este projeto está sob a licença MIT. Veja [LICENSE](LICENSE) para detalhes.
-
----
-
-## 👨‍💻 Autor
-
-**Vinicius** - Desenvolvedor Backend  
+**Vinícius** - Desenvolvedor Backend  
 *Projeto Final - Análise e Desenvolvimento de Sistemas (ADS)*
 
 ---
