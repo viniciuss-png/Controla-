@@ -2,7 +2,6 @@ from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from django.db import transaction
 from django.utils import timezone
 from django.db.models import Sum
 from django.utils.dateparse import parse_date
@@ -15,6 +14,14 @@ from .serializers import (
     ContaSerializer,
     MetaFinanceiraSerializer,
     UserRegisterSerializer
+)
+from .services import (
+    transferir_saldo,
+    depositar_em_meta,
+    confirmar_recebimento_pede_meia,
+    TransferenciaInvalidaError,
+    DepositoMetaError,
+    ConfirmacaoRecebimentoError,
 )
 
 
@@ -83,28 +90,21 @@ class TransacaoViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        transacao = Transacao.objects.filter(
-            usuario=request.user,
-            tipo='entrada',
-            pago=False,
-            data__month=mes,
-            data__year=ano,
-            descricao__startswith="Pé-de-Meia"
-        ).order_by('data').first()
-
-        if not transacao:
+        try:
+            transacao = confirmar_recebimento_pede_meia(request.user, mes, ano)
             return Response(
-                {"detail": "Nenhuma parcela pendente para esse mês."},
+                {
+                    "detail": f"Parcela de {mes}/{ano} confirmada com sucesso.",
+                    "transacao_id": transacao.id,
+                    "valor": float(transacao.valor),
+                },
+                status=status.HTTP_200_OK
+            )
+        except ConfirmacaoRecebimentoError as e:
+            return Response(
+                {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        transacao.pago = True
-        transacao.save()
-
-        return Response(
-            {"detail": f"Parcela de {mes}/{ano} confirmada com sucesso."},
-            status=status.HTTP_200_OK
-        )
 
 class CategoriaViewSet(viewsets.ModelViewSet):
     serializer_class = CategoriaSerializer
@@ -150,78 +150,32 @@ class ContaViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if valor <= 0:
-            return Response(
-                {"detail": "O valor deve ser positivo."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         try:
             origem = Conta.objects.get(id=conta_origem_id, usuario=request.user)
             destino = Conta.objects.get(id=conta_destino_id, usuario=request.user)
         except Conta.DoesNotExist:
             return Response(
-                {"detail": "Uma ou ambas as contas não existem."},
+                {"detail": "Uma ou ambas as contas não existem ou não pertencem a você."},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        if origem.id == destino.id:
+        try:
+            transacao_saida, transacao_entrada = transferir_saldo(
+                request.user, origem, destino, valor
+            )
             return Response(
-                {"detail": "As contas devem ser diferentes."},
+                {
+                    "detail": f"Transferência de R$ {valor:.2f} realizada com sucesso.",
+                    "transacao_saida_id": transacao_saida.id,
+                    "transacao_entrada_id": transacao_entrada.id,
+                },
+                status=status.HTTP_201_CREATED
+            )
+        except TransferenciaInvalidaError as e:
+            return Response(
+                {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        if origem.saldo_inicial < valor:
-            return Response(
-                {"detail": "Saldo insuficiente."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        with transaction.atomic():
-            origem.saldo_inicial -= valor
-            destino.saldo_inicial += valor
-            origem.save()
-            destino.save()
-
-            cat_saida, _ = Categoria.objects.get_or_create(
-                usuario=request.user,
-                nome="Transferência (Saída)",
-                defaults={'tipo_categoria': 'saida'}
-            )
-            cat_entrada, _ = Categoria.objects.get_or_create(
-                usuario=request.user,
-                nome="Transferência (Entrada)",
-                defaults={'tipo_categoria': 'entrada'}
-            )
-
-            hoje = timezone.localdate()
-
-            Transacao.objects.create(
-                usuario=request.user,
-                categoria=cat_saida,
-                conta=origem,
-                tipo='saida',
-                descricao=f"Transferência para {destino.nome}",
-                valor=valor,
-                data=hoje,
-                pago=True
-            )
-
-            Transacao.objects.create(
-                usuario=request.user,
-                categoria=cat_entrada,
-                conta=destino,
-                tipo='entrada',
-                descricao=f"Transferência de {origem.nome}",
-                valor=valor,
-                data=hoje,
-                pago=True
-            )
-
-        return Response(
-            {"detail": f"Transferência de R$ {valor:.2f} realizada com sucesso."},
-            status=status.HTTP_201_CREATED
-        )
 
 class MetaFinanceiraViewSet(viewsets.ModelViewSet):
     serializer_class = MetaFinanceiraSerializer
@@ -268,7 +222,6 @@ class MetaFinanceiraViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def depositar(self, request, pk=None):
-        """Depositar valor em uma meta financeira"""
         try:
             valor = float(request.data.get('valor', 0))
         except (ValueError, TypeError):
@@ -277,91 +230,27 @@ class MetaFinanceiraViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if valor <= 0:
-            return Response(
-                {"detail": "O valor deve ser positivo."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         meta = self.get_object()
-        
-        # Validar se a meta tem conta vinculada
-        if not meta.conta_vinculada:
-            return Response(
-                {"detail": "Meta não possui conta vinculada."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Encontrar conta principal do usuário
-        conta_principal = Conta.objects.filter(
-            usuario=request.user
-        ).order_by('id').first()
-
-        if not conta_principal:
-            return Response(
-                {"detail": "Nenhuma conta encontrada para fazer o depósito."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Verificar saldo
-        if conta_principal.saldo_inicial < valor:
-            return Response(
-                {"detail": "Saldo insuficiente na conta principal."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
 
         try:
-            with transaction.atomic():
-                # Atualizar saldos
-                conta_principal.saldo_inicial -= valor
-                conta_principal.save()
-                
-                meta.conta_vinculada.saldo_inicial += valor
-                meta.conta_vinculada.save()
-
-                # Criar transações
-                cat_saida, _ = Categoria.objects.get_or_create(
-                    usuario=request.user,
-                    nome="Depósito em Meta (Saída)",
-                    defaults={"tipo_categoria": "saida"}
-                )
-
-                cat_entrada, _ = Categoria.objects.get_or_create(
-                    usuario=request.user,
-                    nome="Depósito em Meta (Entrada)",
-                    defaults={"tipo_categoria": "entrada"}
-                )
-
-                hoje = timezone.localdate()
-
-                Transacao.objects.create(
-                    usuario=request.user,
-                    categoria=cat_saida,
-                    conta=conta_principal,
-                    tipo="saida",
-                    descricao=f"Depósito para meta: {meta.nome}",
-                    valor=valor,
-                    data=hoje,
-                    pago=True
-                )
-
-                Transacao.objects.create(
-                    usuario=request.user,
-                    categoria=cat_entrada,
-                    conta=meta.conta_vinculada,
-                    tipo="entrada",
-                    descricao=f"Depósito recebido para meta: {meta.nome}",
-                    valor=valor,
-                    data=hoje,
-                    pago=True
-                )
-
+            transacao_saida, transacao_entrada = depositar_em_meta(
+                request.user, meta, valor
+            )
             return Response(
-                {"detail": f"Depósito de R$ {valor:.2f} realizado na meta '{meta.nome}'."},
+                {
+                    "detail": f"Depósito de R$ {valor:.2f} realizado na meta '{meta.nome}'.",
+                    "transacao_saida_id": transacao_saida.id,
+                    "transacao_entrada_id": transacao_entrada.id,
+                },
                 status=status.HTTP_200_OK
             )
-        except Exception as e:
+        except DepositoMetaError as e:
             return Response(
                 {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {"detail": f"Erro inesperado: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

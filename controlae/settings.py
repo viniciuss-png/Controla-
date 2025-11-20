@@ -139,7 +139,6 @@ REST_FRAMEWORK = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
@@ -151,10 +150,9 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-# drf-spectacular (Swagger/OpenAPI) Configuration
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Controlaê API',
-    'DESCRIPTION': 'API de gestão financeira para alunos com Pé-de-Meia',
+    'DESCRIPTION': 'API de gestão financeira para alunos beneficiados com o benefício Pé-de-Meia',
     'VERSION': '1.0.0',
     'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
     'SERVERS': [
@@ -168,8 +166,8 @@ SPECTACULAR_SETTINGS = {
         }
     ],
     'CONTACT': {
-        'name': 'Vinicius - Backend Developer',
-        'email': 'vinicius@example.com'
+        'name': 'Vinícius Cunha - Backend Developer',
+        'email': 'joseviniciuscds@gmail.com'
     },
     'LICENSE': {
         'name': 'MIT'
