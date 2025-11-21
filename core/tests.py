@@ -47,42 +47,54 @@ def user_authenticated(user_factory, api_client):
 class TestUserRegistration:
     
     def test_user_registration_success(self, api_client):
+        """Testa registro com novos campos do frontend: nome e ano_escolar"""
         data = {
             "username": "newuser123",
             "password": "securepass123",
-            "serie_em": 1
+            "nome": "Novo Usuário",
+            "ano_escolar": 2,
+            "email": "newuser@test.com"
         }
         
         response = api_client.post('/api/register/', data)
         
         assert response.status_code == status.HTTP_201_CREATED
-        assert User.objects.filter(username="newuser123").exists()
-        perfil = PerfilAluno.objects.get(usuario__username="newuser123")
-        assert perfil.serie_em == 1
+        user = User.objects.get(username="newuser123")
+        assert user.first_name == "Novo Usuário"
+        assert user.email == "newuser@test.com"
+        perfil = PerfilAluno.objects.get(usuario=user)
+        assert perfil.serie_em == 2
     
     def test_user_registration_missing_fields(self, api_client):
+        """Testa que nome e ano_escolar são obrigatórios"""
         data = {
-            "username": "incompleteuser"
+            "username": "incompleteuser",
+            "password": "pass123"
+            # Faltam: nome e ano_escolar
         }
         
         response = api_client.post('/api/register/', data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "nome" in response.data or "ano_escolar" in response.data
     
     def test_user_registration_duplicate_username(self, api_client, user_factory):
+        """Testa que username duplicado é rejeitado"""
         user_factory(username="existing")
         
         data = {
             "username": "existing",
-            "email": "different@test.com",
             "password": "pass123",
-            "first_name": "Outro",
-            "last_name": "Usuário"
+            "nome": "Outro Usuário",
+            "ano_escolar": 1,
+            "email": "different@test.com"
         }
         
         response = api_client.post('/api/register/', data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "username" in response.data
     
     def test_perfil_aluno_created_automatically(self, user_factory):
+        """Testa que PerfilAluno é criado automaticamente ao criar User"""
         user = user_factory()
         
         perfil = PerfilAluno.objects.get(usuario=user)
