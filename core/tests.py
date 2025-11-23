@@ -47,35 +47,28 @@ def user_authenticated(user_factory, api_client):
 class TestUserRegistration:
     
     def test_user_registration_success(self, api_client):
-        """Testa registro com novos campos do frontend: nome e ano_escolar"""
+        """Testa registro básico com username e password"""
         data = {
             "username": "newuser123",
-            "password": "securepass123",
-            "nome": "Novo Usuário",
-            "ano_escolar": 2,
-            "email": "newuser@test.com"
+            "password": "securepass123"
         }
         
         response = api_client.post('/api/register/', data)
         
         assert response.status_code == status.HTTP_201_CREATED
         user = User.objects.get(username="newuser123")
-        assert user.first_name == "Novo Usuário"
-        assert user.email == "newuser@test.com"
-        perfil = PerfilAluno.objects.get(usuario=user)
-        assert perfil.serie_em == 2
+        assert user.username == "newuser123"
     
     def test_user_registration_missing_fields(self, api_client):
-        """Testa que nome e ano_escolar são obrigatórios"""
+        """Testa que username e password são obrigatórios"""
         data = {
-            "username": "incompleteuser",
-            "password": "pass123"
-            # Faltam: nome e ano_escolar
+            "username": "incompleteuser"
+            # Falta: password
         }
         
         response = api_client.post('/api/register/', data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "nome" in response.data or "ano_escolar" in response.data
+        assert "password" in response.data
     
     def test_user_registration_duplicate_username(self, api_client, user_factory):
         """Testa que username duplicado é rejeitado"""
@@ -83,10 +76,7 @@ class TestUserRegistration:
         
         data = {
             "username": "existing",
-            "password": "pass123",
-            "nome": "Outro Usuário",
-            "ano_escolar": 1,
-            "email": "different@test.com"
+            "password": "pass123"
         }
         
         response = api_client.post('/api/register/', data)

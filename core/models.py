@@ -67,6 +67,8 @@ class Transacao(models.Model):
 
 class PerfilAluno(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    email = models.EmailField()
     
     SERIE_CHOICES = [
         (1, '1º Ano'), 

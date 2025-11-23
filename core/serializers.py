@@ -9,78 +9,32 @@ from .models import (
 )
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    """
-    Serializer para registro de novos usuários (estudantes).
-    Aceita campos do frontend e mapeia para o modelo User + PerfilAluno.
-    
-    Campos aceitos:
-    - username: identificador único (obrigatório)
-    - password: senha (obrigatório, write_only)
-    - nome: nome completo do estudante (obrigatório, mapeado para first_name)
-    - ano_escolar: série (1-3), obrigatório (mapeado para PerfilAluno.serie_em)
-    - email: email do estudante (opcional)
-    """
-    nome = serializers.CharField(
-        max_length=150,
-        required=True,
-        write_only=True,  # Só entrada, não aparece na resposta
-        help_text="Nome completo do estudante"
-    )
-    ano_escolar = serializers.IntegerField(
-        write_only=True,  # Só entrada
-        required=True,
-        min_value=1,
-        max_value=3,
-        error_messages={
-            'invalid': 'A série deve ser 1, 2 ou 3.',
-            'required': 'O ano escolar é obrigatório.'
-        }
-    )
-    email = serializers.EmailField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=True)
+    serie_em = serializers.IntegerField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'nome', 'email', 'ano_escolar', 'first_name')
-        read_only_fields = ('id', 'first_name')  # first_name é read_only (não aceita input direto)
+        fields = ('id', 'username', 'password', 'email', 'serie_em')
         extra_kwargs = {
             'password': {'write_only': True},
-            'username': {'help_text': 'Identificador único para login'}
         }
 
-    def validate_nome(self, value):
-        """Valida se o nome tem pelo menos 3 caracteres"""
-        if len(value.strip()) < 3:
-            raise serializers.ValidationError(
-                "O nome deve ter pelo menos 3 caracteres."
-            )
-        return value.strip()
-
-    def validate_username(self, value):
-        """Valida se o username já existe"""
-        if User.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError(
-                "Este nome de usuário já está em uso."
-            )
-        return value.lower()
-
     def create(self, validated_data):
-        """Cria novo usuário e seu perfil de aluno"""
-        # Extrai campos customizados
-        ano_escolar = validated_data.pop('ano_escolar')
-        nome = validated_data.pop('nome')
-        
-        # Email é opcional
-        email = validated_data.get('email') or f"{validated_data['username']}@pede-meia.edu.br"
-        validated_data['email'] = email
-        validated_data['first_name'] = nome
-        
-        # Cria o usuário
-        user = User.objects.create_user(**validated_data)
-        
-        # Cria ou atualiza o PerfilAluno
-        perfil, _ = PerfilAluno.objects.get_or_create(usuario=user)
-        perfil.serie_em = ano_escolar
-        perfil.save()
+        serie_em = validated_data.pop('serie_em')
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
+
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=email,
+            password=password
+        )
+
+        PerfilAluno.objects.create(
+            usuario=user,
+            email=email,
+            serie_em=serie_em
+        )
 
         return user
 
