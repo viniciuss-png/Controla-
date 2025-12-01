@@ -30,11 +30,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password=password
         )
 
-        PerfilAluno.objects.create(
+        perfil, _ = PerfilAluno.objects.get_or_create(
             usuario=user,
-            email=email,
-            serie_em=serie_em
+            defaults={
+                'email': email,
+                'serie_em': serie_em
+            }
         )
+        if perfil.serie_em != serie_em:
+            perfil.serie_em = serie_em
+            perfil.save()
 
         return user
 

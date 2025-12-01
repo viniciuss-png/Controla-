@@ -3,10 +3,8 @@
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue)](https://www.python.org/)
 [![Django 5.2.7](https://img.shields.io/badge/Django-5.2.7-darkgreen)](https://www.djangoproject.com/)
 [![DRF 3.16](https://img.shields.io/badge/DRF-3.16-red)](https://www.django-rest-framework.org/)
-[![Tests: 25/25 Passing](https://img.shields.io/badge/Tests-25%2F25%20✓-brightgreen)]()
-[![Coverage 76%](https://img.shields.io/badge/Coverage-76%25-yellowgreen)]()
-
-**Controlaê** é uma plataforma de gestão financeira desenvolvida para alunos do ensino médio que recebem o benefício **Pé-de-Meia**. O sistema permite que os beneficiários rastreiem receitas, despesas, contas bancárias e metas de poupança.
+[![Tests: 29/29 Passing](https://img.shields.io/badge/Tests-29%2F29%20✓-brightgreen)]()  
+[![Coverage 76%](https://img.shields.io/badge/Coverage-76%25-yellowgreen)]()**Controlaê** é uma plataforma de gestão financeira desenvolvida para alunos do ensino médio que recebem o benefício **Pé-de-Meia**. O sistema permite que os beneficiários rastreiem receitas, despesas, contas bancárias e metas de poupança.
 
 # Índice
 
@@ -21,7 +19,6 @@
 - [Testes](#testes)
 - [Banco de Dados](#banco-de-dados)
 - [Segurança](#segurança)
-- [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -33,6 +30,7 @@ Alunos do ensino médio que recebem o Pé-de-Meia (benefício governamental) pre
 - Categorizar despesas
 - Gerenciar múltiplas contas
 - Rastrear metas de poupança
+- Desenvolver Inteligência Financeira
 
 # Funcionalidades Principais
  **Autenticação JWT** - Segura e escalável  
@@ -40,8 +38,9 @@ Alunos do ensino médio que recebem o Pé-de-Meia (benefício governamental) pre
  **CRUD Completo** - Categorias, Contas, Transações, Metas  
  **Transações Atômicas** - Transferências e depósitos garantem integridade  
  **Validações Robustas** - Campos obrigatórios, valores positivos, isolamento por usuário  
- **Testes Automatizados** - 25 testes com 76% de cobertura  
+ **Testes Automatizados** - 29 testes 
  **CORS Configurado** - Frontend e backend rodando em portas diferentes  
+ **Incentivos Pé-de-Meia** - Suporte para Conclusão (bloqueado) e ENEM (imediato)
 
 ---
 
@@ -549,6 +548,236 @@ Response: 200 OK
 
 ---
 
+# Incentivos Pé-de-Meia
+
+## Incentivo Conclusão (R$ 1.000,00)
+
+**Fluxo:**
+1. Ao fim do ano letivo, o frontend pergunta se o aluno passou de ano
+2. Se sim, o sistema cria um incentivo bloqueado de R$ 1.000,00
+3. O aluno recebe notificação para comprovação (certificado)
+4. Admin/sistema libera o incentivo após validação
+5. O valor é creditado na conta do aluno
+
+### Criar Incentivo Conclusão
+```
+POST /api/incentivos/conclusao/
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "ano": 2024,
+  "conta_id": 1
+}
+
+Response: 201 Created
+{
+  "id": 1,
+  "valor": 1000.00,
+  "liberado": false
+}
+```
+
+### Liberar Incentivo Conclusão
+```
+POST /api/incentivos/conclusao/liberar/
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "incentivo_id": 1
+}
+
+Response: 200 OK
+{
+  "id": 1,
+  "transacao_id": 42,
+  "valor": 1000.00
+}
+```
+
+## Incentivo ENEM (R$ 200,00)
+
+**Fluxo:**
+1. Aluno participa dos 2 dias do ENEM (3º ano)
+2. Após comprovação de presença, aluno recebe R$ 200,00
+3. Valor está imediatamente disponível para saque
+
+### Criar Incentivo ENEM
+```
+POST /api/incentivos/enem/
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "ano": 2024,
+  "conta_id": 1
+}
+
+Response: 201 Created
+{
+  "id": 2,
+  "valor": 200.00,
+  "liberado": true
+}
+```
+
+---
+
+# Relatórios e Dashboard
+
+## Gerar Relatório Financeiro em PDF
+
+**Endpoint:** `GET /api/relatorio/pdf/`
+
+**Descrição:** Gera e faz download de um relatório financeiro completo em PDF com resumo, gráficos de dados e transações recentes.
+
+**Parâmetros (Query):**
+- `from_date` (opcional): Data inicial no formato YYYY-MM-DD
+- `to_date` (opcional): Data final no formato YYYY-MM-DD
+
+**Exemplo de Requisição:**
+```bash
+curl -H "Authorization: Bearer {access_token}" \
+  "http://localhost:8000/api/relatorio/pdf/?from_date=2024-01-01&to_date=2024-01-31" \
+  -o relatorio.pdf
+```
+
+**Response:** Arquivo PDF com:
+- Resumo financeiro (entradas, saídas, saldo líquido, Pé-de-Meia recebido)
+- Gastos por categoria (top 10)
+- Saldos por conta
+- Transações recentes (últimas 20)
+- Formatação profissional com cores e tabelas
+
+**Status:**
+- `200 OK` - PDF gerado com sucesso
+- `400 Bad Request` - Parâmetros inválidos
+- `401 Unauthorized` - Token ausente ou inválido
+
+---
+
+## Obter Dados do Dashboard
+
+**Endpoint:** `GET /api/dashboard/`
+
+**Descrição:** Retorna dados otimizados em JSON para renderizar um dashboard completo no frontend. Inclui resumo financeiro, gráficos de categorias, incentivos, contas, metas e transações recentes.
+
+**Parâmetros (Query):**
+- `from_date` (opcional): Data inicial no formato YYYY-MM-DD
+- `to_date` (opcional): Data final no formato YYYY-MM-DD
+
+**Exemplo de Requisição:**
+```bash
+curl -H "Authorization: Bearer {access_token}" \
+  "http://localhost:8000/api/dashboard/?from_date=2024-01-01&to_date=2024-01-31"
+```
+
+**Response: 200 OK**
+```json
+{
+  "resumo": {
+    "total_entradas": 2500.50,
+    "total_saidas": 1200.75,
+    "saldo_liquido": 1299.75,
+    "pede_meia_recebido": 2000.00,
+    "pede_meia_pendente": 200.00
+  },
+  "graficos": {
+    "gastos_categoria": [
+      {"categoria__nome": "Alimentação", "total": 450.00},
+      {"categoria__nome": "Transporte", "total": 250.00},
+      {"categoria__nome": "Lazer", "total": 200.00}
+    ],
+    "entradas_categoria": [
+      {"categoria__nome": "Pé-de-Meia", "total": 2000.00},
+      {"categoria__nome": "Bolsa", "total": 500.50}
+    ]
+  },
+  "incentivos": {
+    "conclusao": [
+      {
+        "id": 1,
+        "ano": 2024,
+        "valor": 1000.00,
+        "liberado": true,
+        "criado_em": "2024-01-15"
+      }
+    ],
+    "enem": [
+      {
+        "id": 2,
+        "ano": 2024,
+        "valor": 200.00,
+        "liberado": true,
+        "criado_em": "2024-01-20"
+      }
+    ]
+  },
+  "contas": [
+    {
+      "id": 1,
+      "nome": "Corrente",
+      "saldo_inicial": 1000.00,
+      "saldo_atual": 1500.50
+    },
+    {
+      "id": 2,
+      "nome": "Poupança",
+      "saldo_inicial": 5000.00,
+      "saldo_atual": 5300.25
+    }
+  ],
+  "metas": [
+    {
+      "id": 1,
+      "nome": "Férias",
+      "valor_alvo": 5000.00,
+      "data_alvo": "2024-07-31",
+      "ativa": true
+    }
+  ],
+  "transacoes_recentes": [
+    {
+      "id": 42,
+      "data": "2024-01-20",
+      "tipo": "entrada",
+      "descricao": "Pé-de-Meia janeiro",
+      "valor": 500.00,
+      "categoria__nome": "Pé-de-Meia",
+      "pago": true
+    }
+  ]
+}
+```
+
+**Uso no Frontend (React/Vue exemplo):**
+```javascript
+// Fetch dados do dashboard
+const response = await fetch(
+  'http://localhost:8000/api/dashboard/?from_date=2024-01-01&to_date=2024-01-31',
+  {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }
+);
+
+const dashboardData = await response.json();
+
+// Usar dados para renderizar gráficos
+renderGraficoGastos(dashboardData.graficos.gastos_categoria);
+renderListaTransacoes(dashboardData.transacoes_recentes);
+renderCartaoResumo(dashboardData.resumo);
+```
+
+**Status:**
+- `200 OK` - Dados retornados com sucesso
+- `400 Bad Request` - Parâmetros inválidos
+- `401 Unauthorized` - Token ausente ou inválido
+
+---
+
 # Autenticação
 
 # Token JWT
@@ -718,7 +947,14 @@ core/tests.py
 └── TestValidacoes (3 testes)
 ```
 
-**Total: 25 testes**
+**Total: 29 testes**
+
+### Detalhamento Completo
+
+- **core/tests.py**: 17 testes (Usuários, JWT, Categorias, Contas, Transações, Metas, Validações)
+- **core/test_services.py**: 4 testes (Transferências, Depósitos, Confirmação de recebimento, Validações)
+- **core/test_incentivos.py**: 4 testes (Incentivos Conclusão, Incentivos ENEM, API endpoints)
+- **core/test_pdf_dashboard.py**: 8 testes novos (Geração de PDF, Estrutura de Dashboard, Filtros)
 
 ---
 
@@ -863,8 +1099,9 @@ GitHub Issues: https://github.com/seu-usuario/Backend_Controlae/issues
 ```
 
 ### Roadmap Futuro
-- [ ] Gráficos de gastos
-- [ ] Relatórios PDF
+- [x] Relatórios PDF
+- [x] Dashboard (API de dados otimizados)
+- [ ] Gráficos interativos no frontend
 - [ ] Notificações de metas
 - [ ] Integração com bancos reais
 - [ ] Mobile app nativo

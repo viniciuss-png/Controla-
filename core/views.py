@@ -6,8 +6,12 @@ from django.utils import timezone
 from django.db.models import Sum
 from django.utils.dateparse import parse_date
 from django.contrib.auth.models import User
+from django.http import FileResponse
 from .permissions import IsOwner
-from .models import Transacao, Categoria, Conta, MetaFinanceira
+from .models import Transacao, Categoria, Conta, MetaFinanceira, Lembrete, Notificacao, Incentivo
+from datetime import date, timedelta
+from django.db.models import Q
+from .serializers_actions import LembreteSerializer, NotificacaoSerializer
 from .serializers import (
     TransacaoSerializer,
     CategoriaSerializer,
@@ -22,8 +26,15 @@ from .services import (
     TransferenciaInvalidaError,
     DepositoMetaError,
     ConfirmacaoRecebimentoError,
+    gerar_relatorio_financeiro_pdf,
+    obter_dados_dashboard,
 )
-
+from .services import (
+    criar_incentivo_conclusao,
+    liberar_incentivo_conclusao,
+    criar_incentivo_enem,
+)
+from rest_framework.views import APIView
 
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -33,6 +44,67 @@ class UserRegisterView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+
+class IncentivoConclusaoCreateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        ano = request.data.get('ano')
+        conta_id = request.data.get('conta_id')
+        try:
+            ano = int(ano)
+        except (TypeError, ValueError):
+            return Response({'detail': 'Campo "ano" inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        conta = None
+        if conta_id:
+            try:
+                conta = Conta.objects.get(id=conta_id, usuario=request.user)
+            except Conta.DoesNotExist:
+                return Response({'detail': 'Conta inválida.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            incentivo = criar_incentivo_conclusao(request.user, ano, conta)
+            return Response({'id': incentivo.id, 'valor': float(incentivo.valor), 'liberado': incentivo.liberado}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class IncentivoConclusaoLiberarView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        incentivo_id = request.data.get('incentivo_id')
+        try:
+            incentivo = Incentivo.objects.get(id=incentivo_id, usuario=request.user, tipo='conclusao')
+        except Exception:
+            return Response({'detail': 'Incentivo não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            incentivo, transacao = liberar_incentivo_conclusao(incentivo)
+            return Response({'id': incentivo.id, 'transacao_id': transacao.id, 'valor': float(transacao.valor)}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class IncentivoEnemCreateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        conta_id = request.data.get('conta_id')
+        ano = request.data.get('ano')
+        conta = None
+        if conta_id:
+            try:
+                conta = Conta.objects.get(id=conta_id, usuario=request.user)
+            except Conta.DoesNotExist:
+                return Response({'detail': 'Conta inválida.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            incentivo, transacao = criar_incentivo_enem(request.user, conta, ano)
+            return Response({'id': incentivo.id, 'transacao_id': transacao.id, 'valor': float(transacao.valor)}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class TransacaoViewSet(viewsets.ModelViewSet):
     serializer_class = TransacaoSerializer
@@ -54,8 +126,9 @@ class TransacaoViewSet(viewsets.ModelViewSet):
     def resumo_financeiro(self, request):
         from_date = request.query_params.get("from_date")
         to_date = request.query_params.get("to_date")
+        user = request.user
 
-        filters = {"usuario": request.user}
+        filters = {"usuario": user}
 
         if from_date:
             filters["data__gte"] = parse_date(from_date)
@@ -73,10 +146,39 @@ class TransacaoViewSet(viewsets.ModelViewSet):
             .aggregate(Sum("valor"))["valor__sum"] or 0
         )
 
+        gastos_categoria_qs = Transacao.objects.filter(
+            **filters, 
+            tipo="saida", 
+            pago=True
+        ).values('categoria__nome').annotate(
+            total=Sum('valor')
+        ).order_by('-total')
+        
+        pede_meia_qs = Transacao.objects.filter(
+            usuario=user,
+            tipo='entrada',
+            descricao__icontains="Pé-de-Meia"
+        )
+        
+        total_pede_meia_recebido = pede_meia_qs.filter(pago=True).aggregate(Sum('valor'))['valor__sum'] or 0
+        
+        parcelas_pendentes_info = pede_meia_qs.filter(pago=False).values(
+            'data', 'valor', 'descricao'
+        ).order_by('data')
+
+        saldos_contas = Conta.objects.filter(usuario=user).values(
+            'id', 'nome', 'saldo_atual'
+        ).order_by('nome')
+        
+        
         return Response({
-            "saldo_atual": total_entradas - total_saidas,
+            "saldo_liquido": total_entradas - total_saidas,
             "total_entradas": total_entradas,
-            "total_saidas": total_saidas
+            "total_saidas": total_saidas,
+            "gastos_por_categoria": list(gastos_categoria_qs),
+            "pede_meia_recebido": total_pede_meia_recebido,
+            "parcelas_pendentes": list(parcelas_pendentes_info),
+            "saldos_por_conta": list(saldos_contas),
         })
 
     @action(detail=False, methods=['post'])
@@ -253,4 +355,122 @@ class MetaFinanceiraViewSet(viewsets.ModelViewSet):
             return Response(
                 {"detail": f"Erro inesperado: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class LembreteViewSet(viewsets.ModelViewSet):
+    serializer_class = LembreteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def get_queryset(self):
+        return Lembrete.objects.filter(usuario=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def hoje(self, request):
+        user = request.user
+        hoje = date.today()
+
+        lembretes = []
+
+        q1 = Lembrete.objects.filter(usuario=user, ativo=True, data_lembrete=hoje)
+
+        trans_q = Transacao.objects.filter(usuario=user, vencimento__isnull=False)
+        for tr in trans_q:
+            for lemb in Lembrete.objects.filter(transacao=tr, ativo=True):
+                if lemb.dias_antes >= 0:
+                    alvo = tr.vencimento - timedelta(days=lemb.dias_antes)
+                    if alvo == hoje:
+                        lembretes.append(lemb)
+
+        rec_q = Lembrete.objects.filter(usuario=user, ativo=True).exclude(recorrencia='nenhuma')
+        for lemb in rec_q:
+            if lemb.data_lembrete:
+                if lemb.recorrencia == 'mensal' and lemb.data_lembrete.day == hoje.day:
+                    lembretes.append(lemb)
+                if lemb.recorrencia == 'anual' and (lemb.data_lembrete.day == hoje.day and lemb.data_lembrete.month == hoje.month):
+                    lembretes.append(lemb)
+                if lemb.recorrencia == 'semanal':
+                    if lemb.data_lembrete.weekday() == hoje.weekday():
+                        lembretes.append(lemb)
+                if lemb.recorrencia == 'diaria':
+                    lembretes.append(lemb)
+
+        lembretes = list(q1) + lembretes
+
+        lemb_serializer = LembreteSerializer(lembretes, many=True, context={'request': request})
+
+        nots = Notificacao.objects.filter(usuario=user, lida=False)
+        nots_serializer = NotificacaoSerializer(nots, many=True)
+
+        return Response({
+            'lembretes': lemb_serializer.data,
+            'notificacoes': nots_serializer.data
+        })
+
+class NotificacaoViewSet(viewsets.ModelViewSet):
+    serializer_class = NotificacaoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def get_queryset(self):
+        return Notificacao.objects.filter(usuario=self.request.user)
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
+    @action(detail=False, methods=['get'])
+    def pendentes(self, request):
+        qs = self.get_queryset().filter(lida=False)
+        return Response(NotificacaoSerializer(qs, many=True).data)
+
+
+class RelatorioFinanceiroPDFView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        from_date = request.query_params.get('from_date')
+        to_date = request.query_params.get('to_date')
+        
+        from_date_obj = parse_date(from_date) if from_date else None
+        to_date_obj = parse_date(to_date) if to_date else None
+        
+        try:
+            pdf_buffer = gerar_relatorio_financeiro_pdf(
+                request.user,
+                from_date=from_date_obj,
+                to_date=to_date_obj
+            )
+            
+            response = FileResponse(
+                pdf_buffer,
+                content_type='application/pdf',
+                as_attachment=True,
+                filename=f'relatorio_financeiro_{timezone.localdate()}.pdf'
+            )
+            return response
+        except Exception as e:
+            return Response(
+                {'detail': f'Erro ao gerar PDF: {str(e)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class DashboardDataView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        from_date = request.query_params.get('from_date')
+        to_date = request.query_params.get('to_date')
+        
+        from_date_obj = parse_date(from_date) if from_date else None
+        to_date_obj = parse_date(to_date) if to_date else None
+        
+        try:
+            dashboard_data = obter_dados_dashboard(
+                request.user,
+                from_date=from_date_obj,
+                to_date=to_date_obj
+            )
+            return Response(dashboard_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'detail': f'Erro ao carregar dados do dashboard: {str(e)}'},
+                status=status.HTTP_400_BAD_REQUEST
             )

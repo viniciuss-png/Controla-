@@ -27,6 +27,7 @@ class Conta(models.Model):
     nome = models.CharField(max_length=60)
     saldo_inicial = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    saldo_atual = models.DecimalField(max_digits=12,decimal_places=2, default=0)
     
     def __str__(self):
         return self.nome
@@ -53,6 +54,13 @@ class Transacao(models.Model):
     parcelas = models.IntegerField(default=1)
     vencimento = models.DateField(null=True, blank=True) 
     pago = models.BooleanField(default=False) 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_valor = self.valor
+        self._original_tipo = self.tipo
+        self._original_conta_id = self.conta_id
+        self._original_pago = self.pago
 
     def __str__(self):
         return f"{self.tipo.upper()} - {self.descricao} - R$ {self.valor}"
@@ -113,3 +121,61 @@ class MetaFinanceira(models.Model):
         verbose_name = "Meta Financeira"
         verbose_name_plural = "Metas Financeiras"
         ordering = ['data_alvo']
+
+class Lembrete(models.Model):
+    RECOR_CHOICES = [
+        ('nenhuma', 'Nenhuma'),
+        ('diaria', 'Diária'),
+        ('semanal', 'Semanal'),
+        ('mensal', 'Mensal'),
+        ('anual', 'Anual'),
+    ]
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=120)
+    descricao = models.TextField(blank=True)
+    data_lembrete = models.DateField(null=True, blank=True)
+    dias_antes = models.IntegerField(default=0) 
+    recorrencia = models.CharField(max_length=10, choices=RECOR_CHOICES, default='nenhuma')
+    transacao = models.ForeignKey('Transacao', null=True, blank=True, on_delete=models.SET_NULL)
+    ativo = models.BooleanField(default=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    ultimo_disparo = models.DateField(null=True, blank=True) 
+
+    def __str__(self):
+        return f"{self.titulo} ({self.usuario.username})"
+
+class Notificacao(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    texto = models.CharField(max_length=300)
+    transacao = models.ForeignKey('Transacao', null=True, blank=True, on_delete=models.SET_NULL)
+    criada_em = models.DateTimeField(auto_now_add=True)
+    lida = models.BooleanField(default=False)
+    link = models.CharField(max_length=255, blank=True, null=True) 
+
+    class Meta:
+        ordering = ['-criada_em']
+
+
+class Incentivo(models.Model):
+    TIPO_CHOICES = [
+        ('conclusao', 'Incentivo Conclusão'),
+        ('enem', 'Incentivo ENEM'),
+    ]
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    ano = models.IntegerField(null=True, blank=True)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    conta = models.ForeignKey(Conta, null=True, blank=True, on_delete=models.SET_NULL)
+    transacao = models.ForeignKey(Transacao, null=True, blank=True, on_delete=models.SET_NULL)
+    liberado = models.BooleanField(default=False)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Incentivo"
+        verbose_name_plural = "Incentivos"
+        ordering = ['-criado_em']
+
+    def __str__(self):
+        return f"Incentivo {self.get_tipo_display()} - {self.usuario.username} - R$ {self.valor}"

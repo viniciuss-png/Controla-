@@ -37,8 +37,8 @@ def criar_usuario_teste():
         email='test@test.com'
     )
     
-    conta1 = Conta.objects.create(usuario=user, nome="Conta Principal", saldo_inicial=Decimal('1000.00'))
-    conta2 = Conta.objects.create(usuario=user, nome="Conta Secundária", saldo_inicial=Decimal('500.00'))
+    conta1 = Conta.objects.create(usuario=user, nome="Conta Principal", saldo_inicial=Decimal('1000.00'), saldo_atual=Decimal('1000.00'))
+    conta2 = Conta.objects.create(usuario=user, nome="Conta Secundária", saldo_inicial=Decimal('500.00'), saldo_atual=Decimal('500.00'))
     
     cat_receita = Categoria.objects.create(usuario=user, nome="Salário", tipo_categoria="entrada")
     cat_despesa = Categoria.objects.create(usuario=user, nome="Compras", tipo_categoria="saida")
@@ -66,13 +66,13 @@ def test_transferir_saldo():
         conta2.refresh_from_db()
         
         print(f"\nv Transferência realizada com sucesso!")
-        print(f"v Conta 1 (depois): R$ {conta1.saldo_inicial}")
-        print(f"v Conta 2 (depois): R$ {conta2.saldo_inicial}")
+        print(f"v Conta 1 (depois): R$ {conta1.saldo_atual}")
+        print(f"v Conta 2 (depois): R$ {conta2.saldo_atual}")
         print(f"v Transação Saída ID: {tx_saida.id} (R$ {tx_saida.valor})")
         print(f"v Transação Entrada ID: {tx_entrada.id} (R$ {tx_entrada.valor})")
         
-        assert conta1.saldo_inicial == Decimal('750.00'), "Saldo conta1 incorreto"
-        assert conta2.saldo_inicial == Decimal('750.00'), "Saldo conta2 incorreto"
+        assert conta1.saldo_atual == Decimal('750.00'), "Saldo conta1 incorreto"
+        assert conta2.saldo_atual == Decimal('750.00'), "Saldo conta2 incorreto"
         assert tx_saida.tipo == 'saida'
         assert tx_entrada.tipo == 'entrada'
         
@@ -100,15 +100,16 @@ def test_depositar_em_meta():
     conta_meta = Conta.objects.create(
         usuario=user,
         nome=f"Poupança: {meta.nome}",
-        saldo_inicial=Decimal('0.00')
+        saldo_inicial=Decimal('0.00'),
+        saldo_atual=Decimal('0.00')
     )
     meta.conta_vinculada = conta_meta
     meta.save()
     
     print(f"v Usuário criado: {user.username}")
     print(f"v Meta criada: {meta.nome}")
-    print(f"v Conta Principal (antes): R$ {conta_principal.saldo_inicial}")
-    print(f"v Conta Meta (antes): R$ {conta_meta.saldo_inicial}")
+    print(f"v Conta Principal (antes): R$ {conta_principal.saldo_atual}")
+    print(f"v Conta Meta (antes): R$ {conta_meta.saldo_atual}")
     
     try:
         valor_deposito = 500.00
@@ -118,13 +119,13 @@ def test_depositar_em_meta():
         conta_meta.refresh_from_db()
         
         print(f"\nv Depósito em meta realizado com sucesso!")
-        print(f"v Conta Principal (depois): R$ {conta_principal.saldo_inicial}")
-        print(f"v Conta Meta (depois): R$ {conta_meta.saldo_inicial}")
+        print(f"v Conta Principal (depois): R$ {conta_principal.saldo_atual}")
+        print(f"v Conta Meta (depois): R$ {conta_meta.saldo_atual}")
         print(f"v Transação Saída ID: {tx_saida.id} (R$ {tx_saida.valor})")
         print(f"v Transação Entrada ID: {tx_entrada.id} (R$ {tx_entrada.valor})")
         
-        assert conta_principal.saldo_inicial == Decimal('500.00'), "Saldo principal incorreto"
-        assert conta_meta.saldo_inicial == Decimal('500.00'), "Saldo meta incorreto"
+        assert conta_principal.saldo_atual == Decimal('500.00'), "Saldo principal incorreto"
+        assert conta_meta.saldo_atual == Decimal('500.00'), "Saldo meta incorreto"
         
         print("\n TEST 2 PASSED")
     except Exception as e:

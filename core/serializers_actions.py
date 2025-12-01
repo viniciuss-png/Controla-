@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Conta
-
+from .models import Lembrete, Notificacao, Conta
 
 class TransferenciaSerializer(serializers.Serializer):
     conta_origem_id = serializers.IntegerField()
@@ -38,3 +37,19 @@ class ConfirmarRecebimentoSerializer(serializers.Serializer):
 
     def validate(self, data):
         return data
+
+class LembreteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lembrete
+        fields = ['id','titulo','descricao','data_lembrete','dias_antes','recorrencia','transacao','ativo','criado_em','ultimo_disparo']
+        read_only_fields = ('usuario','criado_em','ultimo_disparo')
+
+    def create(self, validated_data):
+        validated_data['usuario'] = self.context['request'].user
+        return super().create(validated_data)
+
+class NotificacaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notificacao
+        fields = ['id','texto','transacao','criada_em','lida','link']
+        read_only_fields = ('usuario','criada_em')
