@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlaê - Entrar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <a routerLink="/home">
+                <img class="retorno-home" src="assets/img/Logomarca.png" alt="Logomarca, Volte para tela inicial">
+            </a>
+            <div>
+                <a class="sino-notificacoes" href="#">
+                    <!-- <i class="bi bi-bell"></i> -->
+                </a>
+                <ul>
+                    <li class="menu">
+                        <a class="menu-icone" href="#">
+                            <i class="bi bi-person-circle"></i> 
+                            <i class="bi bi-caret-down-fill"></i>
+                        </a> 
+                        <div class="menu-dropdown">
+                            <a routerLink="/entrar" class="menu-link">Entrar</a>
+                            <a routerLink="/cadastrar" class="menu-link">Cadastrar</a>
+                            <!-- <a href="#" class="menu-link">Perfil</a> -->
+                            <!-- <a href="#" class="menu-link">Sair <i class="bi bi-box-arrow-right"></i></a> -->
+                        </div> 
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="entrar-container">
+            <img src="assets/img/Logomarca.png" alt="Logo Controlaê">
+    
+            <!-- Mensagem de Sucesso -->
+            <div *ngIf="mensagemSucesso" class="alerta alerta-sucesso" role="alert">
+                <i class="bi bi-check-circle"></i>
+                {{ mensagemSucesso }}
+            </div>
+
+            <!-- Mensagem de Erro -->
+            <div *ngIf="mensagemErro" class="alerta alerta-erro" role="alert">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ mensagemErro }}
+            </div>
+
+            <form (ngSubmit)="enviarFormulario()" id="login-form">
+                <div class="campo-de-texto">
+                    <input 
+                        type="email" 
+                        [(ngModel)]="email" 
+                        name="email"
+                        placeholder="Email" 
+                        [disabled]="enviando"
+                        required>
+                </div>
+                
+                <div class="campo-de-texto">
+                    <input 
+                        type="password" 
+                        [(ngModel)]="senha" 
+                        name="password"
+                        placeholder="Senha" 
+                        [disabled]="enviando"
+                        required>
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="botao botao-entrar"
+                    [disabled]="enviando || !email.trim() || !senha.trim()">
+                    <span *ngIf="!enviando">Entrar</span>
+                    <span *ngIf="enviando">
+                        <i class="bi bi-hourglass-split"></i> Entrando...
+                    </span>
+                </button>
+            </form>
+    
+            <a routerLink="/cadastrar" class="botao botao-cadastrar">Cadastrar</a>
+            
+            <a href="#" class="esqueceu-a-senha">Esqueceu a senha?</a>
+        </div>
+    </main>
+
+    <footer>
+        <div>
+            <p>
+                © 2025 CONTROLAÊ - Controle financeiro para beneficiários do Pé de Meia
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

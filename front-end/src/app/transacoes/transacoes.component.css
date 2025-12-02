@@ -1,0 +1,163 @@
+.transacoes-container {
+	width: 100%;
+}
+
+body{
+	width: 100%;
+	text-align: center;
+	background-color:#dfffc5;
+}
+
+.retorno-home {
+	width: 5.6rem;
+}
+
+.menu:hover .menu-dropdown {
+	height: 21.1rem;
+	width: 7rem;
+}
+
+.icones-dropdown{
+	font-size: 1rem;
+}
+
+.exportar-adicionar{
+	margin-top: 7rem;
+}
+.btn-exportar-adicionar{
+	display: flex;
+	flex-direction: column;
+}
+.exportar-adicionar h1{
+	font-size: 1.5rem;
+	font-weight: 700;
+	margin-bottom: 0.5rem;
+}
+.exportar-adicionar h2{
+	font-size: 0.8rem;
+	color: rgb(73, 73, 73);
+}
+.btn {
+	border: none;
+	padding: 0.7rem;
+	border-radius: 1rem;
+	margin: 1rem 0 0 0;
+	cursor: pointer;
+	background-color: white;
+	font-weight: 700;
+}
+.btn:hover{
+	opacity: 30%;
+	transition: 0.3s;
+}
+.btn-exportar{
+	border: 1px solid black;
+	background-color: white;
+}
+.btn-adicionar{
+	background-color: var(--cor-terciaria);
+	color: white;
+	padding: 1rem;
+	font-size: 1rem;
+}
+.campo-de-pesquisa{
+	border: 2px solid black;
+	border-radius: 1rem;
+	margin: 2rem 0 0 0;
+	padding: 0.7rem;
+	align-items: center;
+	cursor: inherit;
+	background-color: white;
+}
+#buscar-transacao{
+	border:none;
+	outline: none;
+}
+.historico-transacoes{
+	background-color: white;
+	border-radius: 1rem;
+	padding: 1rem;
+	text-align: left;
+	margin-top: 1rem;
+	/* margin-bottom: 2rem; */
+	width: 70%;
+}
+.historico-transacoes h2{
+	font-size: 1.3rem;
+	margin: 0.3rem 0 0.7rem 0;
+	box-sizing: border-box;
+}
+.card-transacao{
+	background-color: rgb(243, 243, 243);
+	margin: 0.5rem;
+	padding: 1rem;
+	border-radius: 2rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 80%;
+}
+.card-componentes{
+	display: flex;
+	align-items: center;
+}
+.card-componentes span i{
+	background-color: white;
+	border-radius: 80%;
+	padding: 0.5rem;
+	margin-right: 0.5rem;
+}
+.titulo-transacao{
+	color: black;
+	font-size: 1rem;
+}
+.categoria-transacao{
+	color:rgb(73, 73, 73) ;
+	font-size: 0.8rem;
+}
+.valor-transacao{
+	font-size: 1.3rem;
+	text-align: right;
+}
+.receita{
+	color: green;
+}
+.despesa{
+	color: red;
+}
+
+@media (min-width: 768px){
+	.container-funcionalidades{
+		width: 100%;
+	}
+	.exportar-adicionar{
+		display: flex;
+		justify-content: space-between;
+		margin-left: 1rem;
+		margin-right: 1rem;
+		align-items: center;
+	}
+	.btn-exportar-adicionar{
+		flex-direction: row;
+		gap: 1rem;
+	}
+	.btn{
+		margin: 0;
+	}
+	.campo-de-pesquisa{
+		width: 60%;
+		margin-left: auto;
+		margin-right: auto;
+		margin-bottom: 0.5rem;
+		text-align: left;
+	}
+	.card-transacao{
+		width: 90%;
+	}
+	/* footer{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	} */
+}

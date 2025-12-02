@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlaê - Cadastre-se</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <a routerLink="/home">
+                <img class="retorno-home" src="assets/img/Logomarca.png" alt="Logomarca, Volte para tela inicial">
+            </a>
+            <div>
+                <a class="sino-notificacoes" href="#">
+                    <!-- <i class="bi bi-bell"></i> -->
+                </a>
+                <ul>
+                    <li class="menu">
+                        <a class="menu-icone" href="#">
+                            <i class="bi bi-person-circle"></i> 
+                            <i class="bi bi-caret-down-fill"></i>
+                        </a> 
+                        <div class="menu-dropdown">
+                            <a routerLink="/entrar" class="menu-link">Entrar</a>
+                            <a routerLink="/cadastrar" class="menu-link">Cadastrar</a>
+                            <!-- <a href="#" class="menu-link">Perfil</a> -->
+                            <!-- <a href="#" class="menu-link">Sair <i class="bi bi-box-arrow-right"></i></a> -->
+                        </div> 
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="cadastrar-container">
+            <div class="img-chapeu">
+                <img src="assets/img/CirculoComChapeu.png" alt="Círculo com chapeu de formatura">
+            </div>
+            <h1>Bem-vindo ao Programa Pé de Meia!</h1>
+            <p>Vamos configurar sua conta para aproveitar melhor o benefício</p>
+            <div class="sobre-pe-de-meia">
+                <h3>Sobre o Pé de Meia</h3>
+                <p>O Pé de Meia é um incentivo financeiro-educacional do Governo Federal que deposita R$ 200 por mês para estudantes do ensino médio da rede pública. O Controlaê vai te ajudar a gerenciar esse benefício e suas finanças pessoais de forma inteligente!</p>
+            </div>
+            <div class="figura-usuario">
+                <i class="bi bi-person-square"></i>
+            </div>
+
+            <!-- Mensagem de Sucesso -->
+            <div *ngIf="mensagemSucesso" class="alerta alerta-sucesso" role="alert">
+                <i class="bi bi-check-circle"></i>
+                {{ mensagemSucesso }}
+            </div>
+
+            <!-- Mensagem de Erro Geral -->
+            <div *ngIf="mensagemErro" class="alerta alerta-erro" role="alert">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ mensagemErro }}
+            </div>
+
+            <form [formGroup]="formularioCadastro" (ngSubmit)="enviarFormulario()" id="form-cadastro">
+                <h4>Em qual ano do Ensino Médio você está?</h4>
+                <div>
+                    <select 
+                        class="botao selecionar-ano" 
+                        formControlName="anoEscolar"
+                        [class.input-erro]="temErroValidacao('anoEscolar')">
+                        <option value="">Selecione o ano</option>
+                        <option value="1">1° Ano</option>
+                        <option value="2">2° Ano</option>
+                        <option value="3">3° Ano</option>
+                    </select>
+                    <small *ngIf="temErroValidacao('anoEscolar')" class="erro-validacao">
+                        {{ obterErroValidacao('anoEscolar') }}
+                    </small>
+                </div>
+
+                <div class="campo-de-texto">
+                    <p class="descricao-de-campo">Nome Completo</p>
+                    <input 
+                        type="text" 
+                        id="nome" 
+                        formControlName="nome"
+                        placeholder="Nome Completo"
+                        [class.input-erro]="temErroValidacao('nome')">
+                    <small *ngIf="temErroValidacao('nome')" class="erro-validacao">
+                        {{ obterErroValidacao('nome') }}
+                    </small>
+                </div>
+
+                <div class="campo-de-texto">
+                    <p class="descricao-de-campo">Email</p>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        formControlName="email"
+                        placeholder="seuemail@gmail.com"
+                        [class.input-erro]="temErroValidacao('email')">
+                    <small *ngIf="temErroValidacao('email')" class="erro-validacao">
+                        {{ obterErroValidacao('email') }}
+                    </small>
+                </div>
+                    
+                <div class="campo-de-texto">
+                    <p class="descricao-de-campo">Senha</p>
+                    <input 
+                        type="password" 
+                        id="senha" 
+                        formControlName="senha"
+                        placeholder="Mínimo de 6 caracteres"
+                        [class.input-erro]="temErroValidacao('senha')">
+                    <small *ngIf="temErroValidacao('senha')" class="erro-validacao">
+                        {{ obterErroValidacao('senha') }}
+                    </small>
+                    <small class="dica-senha">
+                        A senha deve conter letras maiúscula, minúscula e número
+                    </small>
+                </div>
+
+                <div class="campo-de-texto">
+                    <p class="descricao-de-campo">Confirmar Senha</p>
+                    <input 
+                        type="password" 
+                        id="confirmar-senha" 
+                        formControlName="confirmarSenha"
+                        placeholder="Digite a senha novamente"
+                        [class.input-erro]="temErroValidacao('confirmarSenha') || (formularioCadastro.hasError('senhasNaoConferem') && formularioCadastro.touched)">
+                    <small *ngIf="temErroValidacao('confirmarSenha') || (formularioCadastro.hasError('senhasNaoConferem') && formularioCadastro.touched)" class="erro-validacao">
+                        {{ obterErroValidacao('confirmarSenha') || 'As senhas não conferem' }}
+                    </small>
+                </div>
+
+                <button 
+                    class="botao botao-enviar" 
+                    type="submit"
+                    [disabled]="enviando || formularioCadastro.invalid">
+                    <span *ngIf="!enviando">Comece a usar o Controlaê</span>
+                    <span *ngIf="enviando">
+                        <i class="bi bi-hourglass-split"></i> Enviando...
+                    </span>
+                </button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <div>
+            <p>
+                © 2025 CONTROLAÊ - Controle financeiro para beneficiários do Pé de Meia
+            </p>
+        </div>
+    </footer>
+    
+</body>
+</html>

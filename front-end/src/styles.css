@@ -1,0 +1,5 @@
+/* Global styles - import user-provided universal styles */
+@import 'assets/css/resets.css';
+@import 'assets/css/style.css';
+
+/* You can add project-wide styles below */

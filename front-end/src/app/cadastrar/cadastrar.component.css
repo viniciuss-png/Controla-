@@ -1,0 +1,214 @@
+body {
+	background-color: rgba(0, 106, 255, 0.833);
+}
+
+h4 {
+	color: black;
+}
+
+.cadastrar-container {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	background-color: white;
+	width: 60%;
+	padding: 2rem;
+	gap: 20px;
+	border-radius: 20px;
+	margin-top: 80px;
+}
+
+.img-chapeu img{
+	width: 80px;
+	position: relative;
+}
+
+h1 {
+	font-size: 24px;
+	font-weight: 600;
+}
+
+p {
+	color: gray;
+	font-size: 12px;
+}
+
+.sobre-pe-de-meia {
+	background-color: rgb(235, 235, 235);
+	padding: 20px;
+	border-radius: 10px;
+	text-align: left;
+}
+
+.sobre-pe-de-meia p {
+	line-height: 1.5;
+}
+
+h3 {
+	margin-bottom: 15px;
+}
+
+.botao {
+	border: none;
+	border-radius: 5px;
+}
+
+.botao:hover {
+	filter: brightness(80%);
+}
+
+.figura-usuario {
+	background-color: rgba(0, 106, 255, 0.833);
+	color: white;
+	padding: 1.3rem;
+	border-radius: 100%;
+}
+
+.bi.bi-person-square{
+	font-size: 1.5rem;
+}
+
+form {
+	width: 100%;
+}
+
+.selecionar-ano {
+	background-color: rgba(0, 106, 255, 0.833);
+	color: white;
+	font-weight: 600;
+	padding: 1rem;
+	margin: 0.5rem 0 1.5rem 0;
+}
+
+.descricao-de-campo {
+	color: black;
+	font-weight: 600;
+	font-size: 0.9rem;
+	text-align: left;
+	margin-bottom: 0.3rem;
+}
+
+.campo-de-texto {
+	margin-bottom: 1rem;
+}
+
+.campo-de-texto input {
+	width: 100%;
+	padding: 15px;
+	font-size: 0.9rem;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	box-sizing: border-box;
+	position: inherit;
+}
+
+::placeholder {
+	color: #aaa;
+	font-family: 'Poppins', Arial, sans-serif;
+}
+
+.botao-enviar {
+	background-color: rgba(0, 106, 255, 0.833);
+	color: white;
+	font-size: 16px;
+	font-weight: 600;
+	height: 3.125rem;
+	width: 100%;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+.botao-enviar:disabled {
+	background-color: #ccc;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+/* Estilos para Validação */
+.input-erro {
+	border-color: #e74c3c !important;
+	background-color: #fadbd8;
+}
+
+.erro-validacao {
+	display: block;
+	color: #e74c3c;
+	font-size: 0.85rem;
+	margin-top: 0.3rem;
+	font-weight: 500;
+}
+
+.dica-senha {
+	display: block;
+	color: #666;
+	font-size: 0.8rem;
+	margin-top: 0.5rem;
+	font-style: italic;
+}
+
+/* Estilos para Alertas */
+.alerta {
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1.5rem;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	font-weight: 500;
+	animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.alerta-sucesso {
+	background-color: #d5f4e6;
+	color: #27ae60;
+	border-left: 4px solid #27ae60;
+}
+
+.alerta-sucesso .bi {
+	font-size: 1.2rem;
+}
+
+.alerta-erro {
+	background-color: #fadbd8;
+	color: #e74c3c;
+	border-left: 4px solid #e74c3c;
+}
+
+.alerta-erro .bi {
+	font-size: 1.2rem;
+}
+
+/* Melhorias no select */
+select {
+	appearance: none;
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	background-size: 1.5em;
+	padding-right: 2.5rem;
+	cursor: pointer;
+}
+
+select:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}

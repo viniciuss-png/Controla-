@@ -1,0 +1,131 @@
+body{
+	background-color:#dfffc5;
+}
+
+.cabecalho{
+	margin: 10rem 1rem 2rem 1rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-direction: column;
+}
+.cabecalho h1{
+	font-size: 28px;
+	font-weight: 700;
+}
+.cabecalho p{
+	font-size: 14px;
+	color: #777;
+	margin: 1rem 0;
+}
+.btn{
+	background-color: var(--cor-terciaria);
+	color: white;
+	border: none;
+	padding: 0.8rem 1.1rem;
+	border-radius: 0.5rem;
+	font-size: 14px;
+	cursor: pointer;
+	transition: 0.5s;
+}
+.btn:hover{
+	opacity: 80%;
+}
+
+.card-total{
+	background-color: white;
+	padding: 1.6rem;
+	border-radius: 12px;
+	margin-top: 1.4rem;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.card-total h2{
+	font-size: 20px;
+}
+.valor-total {
+	font-size: 32px;
+	margin: 0.8rem;
+	font-weight: 700;
+	color: red;
+}
+.descricao {
+	font-size: 14px;
+	color: #777;
+}
+
+.lista-container {
+	margin-top: 1.6rem;
+	background: white;
+	padding: 1.5rem;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+	width: 80%;
+}
+
+.lista-container h2 {
+	margin-bottom: 1.4rem;
+	font-size: 20px;
+}
+
+.item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1.2rem 1.4rem;
+	background: #f3f4f6;
+	border-radius: 10px;
+	margin-bottom: 0.9rem;
+}
+.item.quitado {
+	opacity: 70%;
+}
+.item div input {
+	width: 1.8rem;
+	height: 1.8rem;
+	margin-right: 1rem;
+}
+.item-desc{
+	display: flex;
+	align-items: center;
+}
+.info{
+	display: flex;
+	flex-direction: column;
+}
+.info h3 {
+	font-size: 15px;
+	font-weight: 600;
+}
+.status {
+	font-size: 11px;
+	padding: 4px;
+	border-radius: 6px;
+	margin: 0.5rem 0;
+	color: white;
+}
+.vencido {
+	background: red;
+}
+.data {
+	font-size: 12px;
+	color: #777;
+}
+.valor {
+	margin-left: auto;
+	font-size: 16px;
+	font-weight: 700;
+	color: #ff9900;
+}
+.riscado {
+	color: #999;
+	text-decoration: line-through;
+}
+
+@media (min-width: 768px) {
+	.cabecalho{
+		flex-direction: row;
+		justify-content: space-between;
+		text-align: left;
+		width: 90%;
+	}
+}

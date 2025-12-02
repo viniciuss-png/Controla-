@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlaê - Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+                <nav>
+            <a routerLink="/dashboard">
+                <img class="retorno-home" src="assets/img/Logomarca Horizontal.png" alt="Logomarca, Volte para tela inicial">
+            </a>
+            <div class="nav-bar">
+                <a routerLink="/dashboard"><i class="bi bi-house nav-bar-icone"></i> Dashboard</a>
+                <a routerLink="/transacoes"><i class="bi bi-arrow-left-right nav-bar-icone"></i> Transações</a>
+                <a routerLink="/gastos-fixos"><i class="bi bi-cash-coin nav-bar-icone"></i> Gastos Fixos</a>
+                <a routerLink="/lembretes"><i class="bi bi-bell nav-bar-icone"></i> Lembretes</a>
+                <!-- <a href="dicas.html"><i class="bi bi-lightbulb nav-bar-icone"></i> Dicas</a> -->
+            </div>
+            <div>
+                <a class="sino-notificacoes" href="#">
+                    <i class="bi bi-bell"></i>
+                </a>
+                <ul>
+                    <li class="menu">
+                        <a class="menu-icone" href="#">
+                            <i class="bi bi-person-circle"></i> 
+                            <i class="bi bi-caret-down-fill"></i>
+                        </a> 
+                        <div class="menu-dropdown">
+                            <!-- <a href="entrar.html" class="menu-link">Entrar</a>
+                            <a href="cadastrar.html" class="menu-link">Cadastrar</a> -->
+                            <a href="#" class="menu-link">Perfil</a>
+                            <a class="menu-link" routerLink="/dashboard"><i class="bi bi-house icones-dropdown"></i><br> Dashboard</a>
+                            <a class="menu-link" routerLink="/transacoes"><i class="bi bi-arrow-left-right icones-dropdown"></i><br> Transações</a>
+                            <a class="menu-link" routerLink="/gastos-fixos"><i class="bi bi-cash-coin icones-dropdown"></i> <br>Gastos Fixos</a>
+                            <a class="menu-link" routerLink="/lembretes"><i class="bi bi-bell icones-dropdown"></i><br> Lembretes</a>
+                            <!-- <a class="menu-link" href="dicas.html"><i class="bi bi-lightbulb icones-dropdown"></i><br> Dicas</a> -->
+                            <a href="#" class="menu-link">Sair <i class="bi bi-box-arrow-right icones-dropdown"></i></a>
+                        </div> 
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Dashboard Financeiro</h1>
+        <div class="container-valor-recebido">
+            <div class="container-valor-recebido-cabecalho">
+                <span>
+                    <i class="bi bi-mortarboard icone"></i>
+                </span>
+                <p>Programa Pé de Meia</p>
+            </div>
+
+            <div class="total-beneficio">
+                <h3>Total acumulado</h3>
+                <div class="total-beneficio-recebido">R$ 4.400,00</div>
+                <div class="total-beneficio-mensal"><i class="bi bi-arrow-up-right"></i> +R$ 200,00 p/ mês</div>
+            </div>
+        </div>
+
+        <section class="total-transacoes">
+            <div class="card">
+                <h3>Saldo Total <i class="bi bi-wallet2"></i></h3>
+                <div>R$ 1.300</div>
+                <span class="percentual-variavel"><i class="bi bi-arrow-up-right"></i> +12% em relação ao mês passado</span>
+            </div>
+
+            <div class="card">
+                <h3>Receitas <i class="bi bi-arrow-up-right receita"></i></h3>
+                <div class="receita">R$ 5.800</div>
+                <p>Entradas do mês</p>
+            </div>
+
+            <div class="card">
+                <h3>Despesas <i class="bi bi-arrow-down-right despesa"></i></h3>
+                <div class="despesa">R$ 4.500</div>
+                <p>Saídas do mês</p>
+            </div>
+        </section>
+
+        <section class="detalhes-transacoes">
+            <div class="card">
+                <h2 class="titulo">Evolução Mensal</h2>
+                <div>
+                    Inserir Gráfico de Receitas e Despesas mensais
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="titulo">Despesas por Categoria</h2>
+                <div>
+                    Inserir Gráfico de Despesas por categoria mensais
+                </div>
+            </div>
+        </section>
+
+        <section class="card historico-transacoes">
+            <h2 class="titulo">Últimas Transações</h2>
+            <div class="card-transacao">
+                <div>
+                    <span><i class="bi bi-arrow-up-right receita"></i></span>
+                    <span>
+                        <h4 class="titulo-transacao">Salário</h4>
+                        <span class="categoria-transacao">Salário</span>
+                        <span class="categoria-transacao">06/11/2025</span>
+                    </span>
+                </div>
+                <span class="valor-transacao receita">R$ 1.000</span>
+            </div>
+            <div class="card-transacao">
+                <div>
+                    <span><i class="bi bi-arrow-down-right despesa"></i></span>
+                    <span>
+                        <h4 class="titulo-transacao">Conta de Luz</h4>
+                        <span class="categoria-transacao">Moradia</span>
+                        <span class="categoria-transacao">10/11/2025</span>
+                    </span>
+                </div>
+                <span class="valor-transacao despesa">R$ 250</span>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div>
+            <p>
+                © 2025 CONTROLAÊ - Controle financeiro para beneficiários do Pé de Meia
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
