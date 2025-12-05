@@ -1,0 +1,47 @@
+<header>
+    <nav>
+        <a routerLink="/">
+            <img class="retorno-home" src="logomarca.png" alt="Logomarca, Volte para tela inicial">
+        </a>
+        <div>
+            <a class="sino-notificacoes" routerLink="/lembretes"></a>
+            <ul>
+                <li class="menu">
+                    <a class="menu-icone" routerLink="/dashboard">
+                        <i class="bi bi-person-circle"></i>
+                        <i class="bi bi-caret-down-fill"></i>
+                    </a>
+                    <div class="menu-dropdown">
+                        <a routerLink="/entrar" class="menu-link">Entrar</a>
+                        <a routerLink="/cadastrar" class="menu-link">Cadastrar</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="entrar-container">
+        <img src="logomarca.png" alt="Logo Controlaê">
+
+        <form [formGroup]="form" (ngSubmit)="submit()" id="login-form">
+            <div class="campo-de-texto">
+                <input type="text" formControlName="username" placeholder="nome_usuario123">
+            </div>
+            <div class="campo-de-texto">
+                <input type="password" formControlName="password" placeholder="Senha">
+            </div>
+            <button type="submit" class="botao botao-entrar" [disabled]="loading || form.invalid">Entrar</button>
+            <div class="msg-erro" *ngIf="errorMsg">{{ errorMsg }}</div>
+        </form>
+
+        <a routerLink="/cadastrar" class="botao botao-cadastrar">Cadastrar</a>
+        <a routerLink="/cadastrar" class="esqueceu-a-senha">Esqueceu a senha?</a>
+    </div>
+</main>
+
+<footer>
+    <div>
+        <p>© 2025 CONTROLAÊ - Controle financeiro para beneficiários do Pé de Meia</p>
+    </div>
+</footer>

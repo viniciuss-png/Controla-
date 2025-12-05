@@ -1,0 +1,183 @@
+<app-header></app-header>
+
+    <main>
+        <section class="cabecalho">
+            <div>
+                <h1>Lembretes</h1>
+                <p>Gerencie suas dívidas e pagamentos pendentes</p>
+            </div>
+
+            <button class="btn" (click)="openNovoLembrete()">
+                <i class="bi bi-plus-circle-fill"></i> Novo Lembrete
+            </button>
+            <button class="btn" (click)="toggleMostrarValores()">
+                <i class="bi" [class.bi-eye-fill]="!showValores" [class.bi-eye-slash-fill]="showValores"></i>
+                {{ showValores ? 'Ocultar valores' : 'Mostrar valores' }}
+            </button>
+        </section>
+
+        <section class="card-total">
+            <h2>Total Pendente</h2>
+            <div class="valor-total">
+                <ng-container *ngIf="showValores; else ocultoTotal">R$ {{ getTotalPendente() | number:'1.2-2' }}</ng-container>
+                <ng-template #ocultoTotal>••••</ng-template>
+            </div>
+            <span class="descricao">{{ getQtdPendente() }} pagamento(s) pendente(s)</span>
+        </section>
+
+        <section class="lista-container">
+        <h2>Seus Lembretes</h2>
+
+        <div *ngIf="lembretes.length > 0; else vazio">
+        <div *ngFor="let l of lembretes" class="item" [class.quitado]="isDone(l)">
+            <div class="item-desc">
+                <input type="checkbox" [checked]="isDone(l)" (change)="toggleDone(l)" />
+                <div class="info">
+                    <h3 [class.riscado]="isDone(l)">{{ l.titulo }}</h3>
+                    <span class="categoria">{{ getDescricaoTransacao(l) }}</span>
+                    <span class="data">Vencimento: {{ getVencimentoStr(l) }}</span>
+                    <span class="status" [class.vencido]="isVencido(l)">{{ isVencido(l) ? 'Vencido' : 'Em dia' }}</span>
+                </div>
+            </div>
+            <div class="lado-direito">
+                <div class="valor" [class.riscado]="isDone(l)">
+                    <ng-container *ngIf="showValores; else ocultoItem">R$ {{ getValor(l) || 0 | number:'1.2-2' }}</ng-container>
+                    <ng-template #ocultoItem>••••</ng-template>
+                </div>
+                <div class="item-actions">
+                    <button (click)="abrirEditar(l)"><i class="bi bi-pencil-fill"></i></button>
+                    <button (click)="abrirExcluir(l)"><i class="bi bi-trash-fill"></i></button>
+                </div>
+            </div>
+        </div>
+        </div>
+        <ng-template #vazio>
+            <div class="item">
+                <div class="info">
+                    <h3>Nenhum lembrete cadastrado</h3>
+                    <span class="categoria">Crie um lembrete para não esquecer seus pagamentos.</span>
+                </div>
+            </div>
+        </ng-template>
+
+
+    </section>
+    <!-- Overlay Novo Lembrete -->
+    <div class="overlay" *ngIf="showNovoLembrete">
+        <div class="modal modal-small">
+            <h3>Novo Lembrete</h3>
+            <form (ngSubmit)="salvarLembrete()">
+                <div class="form-row">
+                    <label>Título</label>
+                    <input type="text" [(ngModel)]="form.titulo" name="titulo" required />
+                </div>
+                <div class="form-row">
+                    <label>Descrição</label>
+                    <input type="text" [(ngModel)]="form.descricao" name="descricao" />
+                </div>
+                <div class="form-row">
+                    <label>Data do lembrete</label>
+                    <input type="date" [(ngModel)]="form.data_lembrete" name="data_lembrete" />
+                </div>
+                <div class="form-row">
+                    <label>Dias antes</label>
+                    <input type="number" min="0" [(ngModel)]="form.dias_antes" name="dias_antes" />
+                </div>
+                <div class="form-row">
+                    <label>Recorrência</label>
+                    <select [(ngModel)]="form.recorrencia" name="recorrencia" required>
+                        <option value="nenhuma">Nenhuma</option>
+                        <option value="diaria">Diária</option>
+                        <option value="semanal">Semanal</option>
+                        <option value="mensal">Mensal</option>
+                        <option value="anual">Anual</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Transação vinculada</label>
+                    <select [(ngModel)]="form.transacao" name="transacao">
+                        <option [value]="null">Nenhuma</option>
+                        <option *ngFor="let t of transacoes" [value]="t.id">{{ t.descricao }} - R$ {{ t.valor | number:'1.2-2' }}</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Ativo</label>
+                    <select [(ngModel)]="form.ativo" name="ativo">
+                        <option [value]="true">Sim</option>
+                        <option [value]="false">Não</option>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="closeNovoLembrete()">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Salvar</button>
+                </div>
+                <div class="erro" *ngIf="error">{{ error }}</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay Editar Lembrete -->
+    <div class="overlay" *ngIf="showEditModal">
+        <div class="modal modal-small">
+            <h3>Editar Lembrete</h3>
+            <form (ngSubmit)="salvarEdicao()">
+                <div class="form-row">
+                    <label>Título</label>
+                    <input type="text" [(ngModel)]="editForm.titulo" name="edit_titulo" required />
+                </div>
+                <div class="form-row">
+                    <label>Data do lembrete</label>
+                    <input type="date" [(ngModel)]="editForm.data_lembrete" name="edit_data" />
+                </div>
+                <div class="form-row">
+                    <label>Dias antes</label>
+                    <input type="number" min="0" [(ngModel)]="editForm.dias_antes" name="edit_dias_antes" />
+                </div>
+                <div class="form-row">
+                    <label>Recorrência</label>
+                    <select [(ngModel)]="editForm.recorrencia" name="edit_recorrencia" required>
+                        <option value="nenhuma">Nenhuma</option>
+                        <option value="diaria">Diária</option>
+                        <option value="semanal">Semanal</option>
+                        <option value="mensal">Mensal</option>
+                        <option value="anual">Anual</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Transação vinculada</label>
+                    <select [(ngModel)]="editForm.transacao" name="edit_transacao">
+                        <option [value]="null">Nenhuma</option>
+                        <option *ngFor="let t of transacoes" [value]="t.id">{{ t.descricao }} - R$ {{ t.valor | number:'1.2-2' }}</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Ativo</label>
+                    <select [(ngModel)]="editForm.ativo" name="edit_ativo">
+                        <option [value]="true">Sim</option>
+                        <option [value]="false">Não</option>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="cancelarEdicao()">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Salvar</button>
+                </div>
+                <div class="erro" *ngIf="error">{{ error }}</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay Excluir Lembrete -->
+    <div class="overlay" *ngIf="showDeleteModal">
+        <div class="modal modal-small">
+            <h3>Excluir Lembrete</h3>
+            <p>Tem certeza que deseja excluir este lembrete?</p>
+            <div class="actions">
+                <button type="button" class="btn" (click)="cancelarExcluir()">Cancelar</button>
+                <button type="button" class="btn btn-adicionar" (click)="confirmarExcluir()" [disabled]="loading">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    </main>
+    
+<app-footer></app-footer>

@@ -1,0 +1,127 @@
+<app-header></app-header>
+
+    <main>
+        <section class="cabecalho">
+            <div>
+                <h1>Gastos Fixos</h1>
+                <p>Gerencie suas despesas mensais recorrentes</p>
+            </div>
+    
+            <button class="btn" (click)="openNovoGastoFixo()">
+                <i class="bi bi-plus-circle-fill"></i> Novo Gasto Fixo
+            </button>
+        </section>
+
+        <section class="card-resumo">
+            <h2>Resumo Mensal</h2>
+            <div class="valor-resumo">R$ 2.039,80</div>
+            <span class="descricao">Total de gastos fixos mensais</span>
+        </section>
+
+        <section class="lista-container">
+            <h2>Seus Gastos Fixos</h2>
+
+            <div class="item">
+                <div class="item-desc">
+                    <div class="icone"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="info">
+                        <h3>Aluguel</h3>
+                        <span class="categoria">Moradia</span>
+                        <span class="vencimento">Vencimento: dia 5</span>
+                    </div>
+                </div>
+                <div class="valor">R$ 1.500,00</div>
+            </div>
+
+            <div class="item">
+                <div class="item-desc">
+                    <div class="icone"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="info">
+                        <h3>Conta de Luz</h3>
+                        <span class="categoria">Moradia</span>
+                        <span class="vencimento">Vencimento: dia 10</span>
+                    </div>
+                </div>
+                <div class="valor">R$ 250,00</div>
+            </div>
+
+            <div class="item">
+                <div class="item-desc">
+                    <div class="icone"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="info">
+                        <h3>Internet</h3>
+                        <span class="categoria">Moradia</span>
+                        <span class="vencimento">Vencimento: dia 15</span>
+                    </div>
+                </div>
+                <div class="valor">R$ 99,90</div>
+            </div>
+
+            <div class="item">
+                <div class="item-desc">
+                    <div class="icone"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="info">
+                        <h3>Netflix</h3>
+                        <span class="categoria">Lazer</span>
+                        <span class="vencimento">Vencimento: dia 5</span>
+                    </div>
+                </div>
+                <div class="valor">R$ 39,90</div>
+            </div>
+
+            <div class="item">
+                <div class="item-desc">
+                    <div class="icone"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="info">
+                        <h3>Academia</h3>
+                        <span class="categoria">Saúde</span>
+                        <span class="vencimento">Vencimento: dia 1</span>
+                    </div>
+                </div>
+                <div class="valor">R$ 150,00</div>
+            </div>
+    </section>
+
+    </main>
+    
+    <!-- Overlay Novo Gasto Fixo (segue padrão de transações) -->
+    <div class="overlay" *ngIf="showNovoGastoModal">
+        <div class="modal modal-small">
+            <h3>Novo Gasto Fixo</h3>
+            <form (ngSubmit)="salvarGastoFixo()">
+                <div class="form-row">
+                    <label>Descrição</label>
+                    <input type="text" [(ngModel)]="novoGasto.descricao" name="gf_descricao" placeholder="Ex.: Aluguel" required />
+                </div>
+                <div class="form-row">
+                    <label>Valor (R$)</label>
+                    <input type="number" step="0.01" min="0" [(ngModel)]="novoGasto.valor" name="gf_valor" required />
+                </div>
+                <div class="form-row">
+                    <label>Dia do vencimento</label>
+                    <input type="number" min="1" max="31" [(ngModel)]="novoGasto.dia_vencimento" name="gf_dia" required />
+                </div>
+                <div class="form-row">
+                    <label>Categoria</label>
+                    <select [(ngModel)]="novoGasto.categoria" name="gf_categoria" required>
+                        <option [value]="0" disabled>Selecione...</option>
+                        <option *ngFor="let c of categorias" [value]="c.id">{{ c.nome }} ({{ c.tipo_categoria }})</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Conta</label>
+                    <select [(ngModel)]="novoGasto.conta" name="gf_conta" required>
+                        <option [value]="0" disabled>Selecione...</option>
+                        <option *ngFor="let conta of contas" [value]="conta.id">{{ conta.nome }}</option>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="closeNovoGastoFixo()">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Salvar</button>
+                </div>
+                <div class="erro" *ngIf="error">{{ error }}</div>
+            </form>
+        </div>
+    </div>
+    
+<app-footer></app-footer>

@@ -1,0 +1,72 @@
+header{
+    position: sticky;
+    top: 0;
+    z-index: 500; /* acima do conteúdo, abaixo dos overlays (1000+) */
+    background: #fff;
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+}
+.nav-bar a { 
+  margin-right: 1rem;
+ }
+.retorno-home { 
+  width: 80px;  
+}
+.nav-bar-icone { 
+  margin-right: 0.25rem; 
+}
+
+.menu {
+    position: relative;
+    margin-right: 1rem ;
+}
+.menu-icone {
+    margin-top: auto;
+    margin-bottom: auto;
+    color: var(--cor-principal);
+    cursor: pointer;
+    margin-left: 1rem;
+}
+.bi.bi-person-circle {
+    font-size: 1.5rem;
+}
+.menu .menu-dropdown {
+    flex-direction: column;
+    position: absolute;
+    background-color: #699c40b9;
+    width: 6rem;
+    height: 0;
+    overflow: hidden;
+}
+.menu-link {
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 1rem;
+}
+.menu:hover .menu-dropdown {
+    height: auto;
+    width: 7rem;
+    transition: 0.5s;
+}
+.menu:hover .menu-link:hover {
+    background-color: var(--cor-principal);
+}
+.nav-bar{
+    position: absolute;
+    height: 0;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .nav-bar {
+        position: static;
+        height: auto;
+        overflow: visible;
+    }
+}

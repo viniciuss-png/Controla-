@@ -1,0 +1,155 @@
+body {
+    width: 100%;
+    background-color:#dfffc5;
+}
+
+
+/* header */
+.retorno-home {
+    width: 5.6rem;
+}
+
+.menu:hover .menu-dropdown {
+    height: 21.1rem;
+    width: 7rem;
+}
+
+.icones-dropdown{
+    font-size: 1rem;
+}
+
+/* main */
+h1{
+    margin-top: 8rem;
+    margin-bottom: 2rem;
+    text-align: left;
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-left: 1rem;
+}
+
+.container-valor-recebido {
+    background-color: var(--cor-principal);
+    padding: 2rem;
+    border-radius: 1rem;
+    align-items: left;
+}
+
+.container-valor-recebido-cabecalho{
+    display: flex;
+    margin-bottom: 2.5rem;
+    align-items: center;
+    color: white;
+}
+.icone{
+    background-color: #8ed652;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    border-radius: 1rem;
+    margin-right: 0.5rem;
+}
+
+.total-beneficio{
+    color: white;
+    text-align: left;
+}
+
+.total-beneficio h3{
+    font-size: 0.8rem;
+}
+
+.total-beneficio-recebido{
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 0.5rem 0 0.5rem 0;
+}
+
+.total-beneficio-mensal{
+    font-size: 1rem;
+}
+
+.total-transacoes{
+    margin: 2rem 0;
+}
+
+.card{
+    background-color: white;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 1rem;
+}
+
+.card h3{
+    color: rgb(73, 73, 73);
+}
+
+.card div{
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin: 0.5rem 0;
+}
+
+.percentual-variavel{
+    font-size: 0.8rem;
+    color: green;
+}
+
+.receita{
+    color: green;
+}
+
+.despesa{
+    color: red;
+}
+
+.historico-transacoes{
+    width: 80%;
+}
+
+.titulo{
+    text-align: left;
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    color: black;
+}
+
+.card-transacao{
+    background-color: rgb(243, 243, 243);
+    margin: 2rem;
+    padding: 1rem;
+    border-radius: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titulo-transacao{
+    color: black;
+    font-size: 1rem;
+}
+
+.categoria-transacao{
+    color:rgb(73, 73, 73) ;
+    font-size: 0.8rem;
+}
+
+.valor-transacao{
+    font-size: 1.3rem;
+}
+
+@media (min-width: 768px){
+    .container-valor-recebido {
+        width: 60%;
+    }
+    .total-transacoes{
+        display: flex;
+    }
+    .detalhes-transacoes{
+        display: flex;
+        width: 80%;
+    }
+    .historico-transacoes{
+        width: 60%;
+    }
+}

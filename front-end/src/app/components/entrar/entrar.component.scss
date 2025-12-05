@@ -1,0 +1,94 @@
+body {
+    background-color: #94cc66;
+}
+
+/* Área de Preenchimento */
+.entrar-container {
+    width: 80%;
+    max-width: 25rem;
+    padding: 1rem; 
+    box-sizing: border-box; 
+    text-align: center;
+    background-color: white;
+    border-radius: 10px;
+    margin-top: 8rem;
+}
+
+.entrar-container img {
+    max-width: 9rem;
+    margin-bottom: 30px;
+    margin-right: auto;
+    object-fit: cover;
+}
+
+/* Campos de Email e Senha */
+.campo-de-texto {
+    margin-bottom: 15px;
+    display: flex;
+}
+
+.campo-de-texto input {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    position: inherit;
+}
+
+/* Seleciona todos inputs */
+::placeholder {
+    color: #aaa;
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+/* Estilo base para botões */
+.botao {
+    display: block;
+    padding: 15px;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.botao:hover {
+    filter: brightness(80%);
+}
+
+/* Botão "Entrar" (Verde) */
+.botao-entrar {
+    background-color: var(--cor-principal);
+    color: white;
+}
+
+/* Botão "Cadastrar" (Laranja) */
+.botao-cadastrar {
+    background-color: var(--cor-secundaria);
+    color: white;
+    width: 90%;
+    margin: 0 0 0 5%;
+}
+
+/* Link "Esqueceu a senha?" */
+.esqueceu-a-senha {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+}
+.esqueceu-a-senha:hover {
+    text-decoration: underline;
+}
+.msg-erro{
+    color: red;
+    margin-bottom: 1rem;
+}

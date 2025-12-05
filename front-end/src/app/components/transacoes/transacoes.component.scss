@@ -1,0 +1,342 @@
+.floating-toast {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    background: #28a745;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.floating-toast i {
+    font-size: 18px;
+}
+.container-funcionalidades{
+    text-align: center;
+}
+.exportar-adicionar{
+    margin-top: 7rem;
+}
+.btn-exportar-adicionar{
+    display: flex;
+    flex-direction: column;
+}
+.exportar-adicionar h1{
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.exportar-adicionar h2{
+    font-size: 0.8rem;
+    color: rgb(73, 73, 73);
+}
+.btn {
+    border: none;
+    padding: 0.7rem;
+    border-radius: 1rem;
+    margin: 1rem 0 0 0;
+    cursor: pointer;
+    background-color: white;
+    font-weight: 700;
+}
+.btn:hover{
+    opacity: 30%;
+    transition: 0.3s;
+}
+.btn-exportar{
+    border: 1px solid black;
+    background-color: white;
+}
+.btn-adicionar{
+    background-color: var(--cor-terciaria);
+    color: white;
+    padding: 1rem;
+    font-size: 1rem;
+}
+.btn-link{
+    background-color: #dfeaff;
+    padding: 1rem;
+    margin: 1rem 0 2rem 0;
+    border-radius: 0.5rem;
+}
+/* mini ações junto de selects */
+.mini-actions{
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+.mini-actions .btn.btn-link{
+    padding: 0.35rem 0.5rem;
+    margin: 0;
+    background-color: #eef2ff;
+}
+.mini-actions i{ font-size: 0.9rem; }
+.btn.btn-link {
+    margin-right: 0.3rem;
+    margin-left: 0.3rem;
+}
+.campo-de-pesquisa{
+    border: 2px solid black;
+    border-radius: 1rem;
+    margin: 2rem 0 0 0;
+    padding: 0.7rem;
+    align-items: center;
+    cursor: inherit;
+    background-color: white;
+}
+#buscar-transacao{
+    border:none;
+    outline: none;
+}
+.historico-transacoes{
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: left;
+    margin-top: 1rem;
+    width: 90%;
+    box-sizing: border-box;
+}
+.historico-transacoes h2{
+    font-size: 1.3rem;
+    margin: 0.3rem 0 0.7rem 0;
+    box-sizing: border-box;
+    text-align: center;
+}
+.card-transacao{
+    background-color: rgb(243, 243, 243);
+    margin: 0.5rem 0;
+    padding: 1rem;
+    border-radius: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    padding-bottom: 2.2rem; /* espaço para ações no canto */
+}
+.card-componentes{
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+.card-componentes span i{
+    background-color: white;
+    border-radius: 80%;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+}
+.infos-trans{
+    display: flex;
+    flex-direction: column;
+}
+.titulo-transacao{
+    color: black;
+    font-size: 1rem;
+}
+.categoria-transacao{
+    color:rgb(73, 73, 73) ;
+    font-size: 0.8rem;
+}
+.valor-transacao{
+    font-size: 1rem;
+    text-align: right;
+}
+.card-actions{
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.6rem;
+    display: flex;
+    gap: 0.35rem;
+}
+.card-actions .btn.btn-link{
+    background-color: #eef2ff;
+    padding: 0.25rem 0.4rem;
+    margin: 0;
+    border-radius: 0.5rem;
+}
+.card-actions i{
+    font-size: 0.9rem;
+}
+.receita{
+    color: green;
+}
+.despesa{
+    color: red;
+}
+
+/* Overlay modal */
+.overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal{
+    background: #fff;
+    padding: 0.6rem;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 250px;
+    max-height: 450px;
+    overflow-y: auto; /* rolagem caso o conteúdo ultrapasse */
+}
+
+.modal-small{
+    max-width: 360px;
+    width: auto;
+    height: auto;
+}
+
+.modal h3{
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.form-row{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+}
+
+.form-row label{
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.form-row input,
+.form-row select{
+    padding: 0.4rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.actions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.modal .btn{
+    padding: 0.5rem 0.6rem;
+    font-size: 0.85rem;
+}
+
+.erro{
+    color: #b00020;
+    margin-top: 0.5rem;
+}
+
+.novo-item{
+    background-color: #dfeaff;
+    padding: 6px;
+    border-radius: 5px;
+}
+
+@media (min-width: 768px){
+    /* Ajustes para tablets/desktops: modal mais compacto */
+    .modal{
+        max-width: 400px;
+        max-height: 460px;
+        padding: 0.6rem;
+    }
+    .container-funcionalidades{
+        width: 80%;
+        align-items: center;
+    }
+    .exportar-adicionar{
+        display: flex;
+        justify-content: space-between;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        align-items: center;
+    }
+    .btn-exportar-adicionar{
+        flex-direction: row;
+        gap: 1rem;
+    }
+    .btn{
+        margin: 0;
+    }
+    .campo-de-pesquisa{
+        width: 60%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 0.5rem;
+        text-align: left;
+    }
+    .card-transacao{ width: 100%; }
+    .campo-de-pesquisa{
+    width: 13rem;
+    }
+}
+
+/* Toast simples */
+.app-toast{
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 0.6rem;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.app-toast.success{
+    background: #28a745; /* verde estilo bootstrap */
+}
+.app-toast i{
+    font-size: 1.1rem;
+}
+.app-toast span{
+    font-weight: 600;
+}
+
+/* Ajustes mobile para histórico de transações */
+@media (max-width: 480px){
+    .historico-transacoes{
+        width: 100%;
+        padding: 0.75rem;
+    }
+    .card-transacao{
+        width: 100%;
+        margin: 0.5rem 0;
+        padding: 0.75rem 0.75rem 2rem 0.75rem; /* espaço para ações */
+        border-radius: 1rem;
+    }
+    .card-componentes span i{
+        margin-right: 0.4rem;
+        padding: 0.4rem;
+    }
+    .titulo-transacao{
+        font-size: 0.95rem;
+    }
+    .categoria-transacao{
+        font-size: 0.75rem;
+    }
+    .valor-transacao{
+        font-size: 0.95rem;
+    }
+    .card-actions{
+        right: 0.5rem;
+        bottom: 0.45rem;
+    }
+}

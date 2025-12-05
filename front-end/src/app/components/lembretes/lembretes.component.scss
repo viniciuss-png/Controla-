@@ -1,0 +1,244 @@
+body {
+    background-color: #dfffc5;
+    text-align: center;
+}
+
+/* header */
+.retorno-home {
+    width: 5.6rem;
+}
+
+.menu:hover .menu-dropdown {
+    height: 21.1rem;
+    width: 7rem;
+}
+
+.icones-dropdown {
+    font-size: 1rem;
+}
+
+/* main */
+.cabecalho {
+    margin: 10rem 1rem 2rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.cabecalho h1 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.cabecalho p {
+    font-size: 14px;
+    color: #777;
+    margin: 1rem 0;
+}
+
+.btn {
+    background-color: var(--cor-terciaria);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.1rem;
+    border-radius: 0.5rem;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.5s;
+    margin: 1rem;
+}
+
+.btn:hover {
+    opacity: 80%;
+}
+
+.card-total {
+    background-color: white;
+    padding: 1.6rem;
+    border-radius: 12px;
+    margin-top: 1.4rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card-total h2 {
+    font-size: 20px;
+}
+
+.valor-total {
+    font-size: 32px;
+    margin: 0.8rem;
+    font-weight: 700;
+    color: red;
+}
+
+.descricao {
+    font-size: 14px;
+    color: #777;
+}
+
+.lista-container {
+    margin-top: 1.6rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 80%;
+}
+
+.lista-container h2 {
+    margin-bottom: 1.4rem;
+    font-size: 20px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.4rem;
+    background: #f3f4f6;
+    border-radius: 10px;
+    margin-bottom: 0.9rem;
+}
+
+.item.quitado {
+    opacity: 70%;
+}
+
+.item div input {
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-right: 1rem;
+}
+
+.item-desc {
+    display: flex;
+    align-items: center;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.5rem ;
+}
+
+.info h3 {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.status {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #ffd54f; /* amarelo para Em dia */
+    color: #3d3d3d;
+}
+
+.vencido {
+    background: #e53935; /* vermelho para Vencido */
+    color: #fff;
+}
+
+.data {
+    font-size: 12px;
+    color: #777;
+}
+
+.lado-direito { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-end; 
+    margin-left: auto; 
+}
+.valor { 
+    font-size: 16px; 
+    font-weight: 700; 
+    color: #ff9900; 
+}
+.item-actions {
+    display: flex;
+    gap: .6rem;
+    justify-content: flex-end;
+    margin: .4rem 0 0;
+}
+.item-actions button {
+    padding: 0.4rem;
+    font-size: 16px;
+    border: none;
+}
+.categoria { font-size: 12px; color: #555; }
+
+.riscado {
+    color: #999;
+    text-decoration: line-through;
+}
+
+/* Overlay padrão (igual transações) */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.2rem;
+    width: 100%;
+    max-width: 250px;
+    max-height: 450px;
+    overflow-y: auto; /* rolagem caso o conteúdo ultrapasse */
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.8rem;
+}
+
+.form-row label {
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+.form-row input,
+.form-row select {
+    padding: 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-end;
+    margin-top: 0.6rem;
+}
+
+.erro {
+    color: #d9534f;
+    margin-top: 0.6rem;
+}
+
+@media (min-width: 768px) {
+    .cabecalho {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+        width: 90%;
+    }
+
+    .modal{
+        max-width: 700px;
+        max-height: 460px;
+        padding: 0.6rem;
+    }
+}

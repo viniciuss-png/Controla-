@@ -1,0 +1,78 @@
+<header>
+    <nav>
+        <a routerLink="/">
+            <img class="retorno-home" src="logomarca.png" alt="Logomarca, Volte para tela inicial">
+        </a>
+        <div>
+            <a class="sino-notificacoes" routerLink="/lembretes"></a>
+            <ul>
+                <li class="menu">
+                    <a class="menu-icone" routerLink="/dashboard">
+                        <i class="bi bi-person-circle"></i>
+                        <i class="bi bi-caret-down-fill"></i>
+                    </a>
+                    <div class="menu-dropdown">
+                        <a routerLink="/entrar" class="menu-link">Entrar</a>
+                        <a routerLink="/cadastrar" class="menu-link">Cadastrar</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<main>
+    <section class="cadastrar-container">
+            <div class="img-chapeu">
+                <img src="circuloComChapeu.png" alt="Círculo com chapeu de formatura">
+            </div>
+            <h1>Bem-vindo ao Programa Pé de Meia!</h1>
+            <p>Vamos configurar sua conta para aproveitar melhor o benefício</p>
+            <div class="sobre-pe-de-meia">
+                <h3>Sobre o Pé de Meia</h3>
+                <p>O Pé de Meia é um incentivo financeiro-educacional do Governo Federal que deposita R$ 200 por mês para estudantes do ensino médio da rede pública. O Controlaê vai te ajudar a gerenciar esse benefício e suas finanças pessoais de forma inteligente!</p>
+            </div>
+            <div class="figura-usuario">
+                <i class="bi bi-person-square"></i>
+            </div>
+            <form [formGroup]="form" (ngSubmit)="submit()" class="cadastrar-form">
+                <h4>Em qual ano do Ensino Médio você está?</h4>
+                <select class="botao selecionar-ano" formControlName="serie_em">
+                    <option [value]="1">1° Ano</option>
+                    <option [value]="2">2° Ano</option>
+                    <option [value]="3">3° Ano</option>
+                </select>
+
+                <div class="campo-de-texto">
+                    <p class="descricao-de-campo">Nome de Usuário</p>
+                    <input type="text" formControlName="username" placeholder="nome_usuario123">
+                </div>
+                <div class="campo-de-texto">
+                    <p class="descricao-de-campo">Email</p>
+                    <input type="email" formControlName="email" placeholder="seuemail@gmail.com">
+                </div>
+                
+                <div class="campo-de-texto">
+                    <p class="descricao-de-campo">Senha</p>
+                    <input type="password" formControlName="password" placeholder="Mínimo de 6 caracteres">
+                </div>
+
+                <div class="campo-de-texto">
+                    <p class="descricao-de-campo">Confirmar Senha</p>
+                    <input type="password" formControlName="confirmPassword" placeholder="Digite a senha novamente">
+                </div>
+
+                <div class="msg-erro" *ngIf="form.errors?.['passwordMismatch']">As senhas não conferem.</div>
+
+                <button class="botao botao-enviar" type="submit" [disabled]="loading || form.invalid">Comece a usar o Controlaê</button>
+                <div class="msg-erro" *ngIf="errorMsg">{{ errorMsg }}</div>
+                <div class="msg-sucesso" *ngIf="successMsg">{{ successMsg }}</div>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <div>
+            <p>
+                © 2025 CONTROLAÊ - Controle financeiro para beneficiários do Pé de Meia
+            </p>
+        </div>
+    </footer>

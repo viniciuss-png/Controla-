@@ -1,0 +1,357 @@
+<app-header></app-header>
+
+<main>
+    <section class="container-funcionalidades">
+        <div class="exportar-adicionar">
+            <span>
+                <h1>Transações</h1>
+                <h2>Gerencie suas entradas e saídas</h2>
+            </span>
+            <span class="btn-exportar-adicionar">
+                <button class="btn btn-exportar" (click)="exportarPDF()"><i class="bi bi-file-earmark-arrow-down-fill"></i> Exportar
+                    PDF</button>
+                <button class="btn btn-adicionar" (click)="openModal()"><i class="bi bi-plus-circle-fill"></i> Nova
+                    Transação</button>
+            </span>
+        </div>
+        <div class="campo-de-pesquisa">
+            <i class="bi bi-search"></i>
+            <input type="text" id="buscar-transacao" name="buscar-transacao" placeholder="Buscar transações..."
+                [(ngModel)]="termoBusca" (input)="onBuscaChange($event.target.value)" />
+        </div>
+        <button class="btn" [class.ativo]="filtroTipo==='todas'" (click)="setFiltro('todas')">Todas</button>
+        <button class="btn receita" [class.ativo]="filtroTipo==='entrada'" (click)="setFiltro('entrada')">Receitas</button>
+        <button class="btn despesa" [class.ativo]="filtroTipo==='saida'" (click)="setFiltro('saida')">Despesas</button>
+    </section>
+
+    <!-- Mensagens flutuantes removidas para categoria/conta; manter apenas uso futuro geral se necessário -->
+    <div *ngIf="showToastSuccess" class="floating-toast">
+        <i class="bi bi-check-circle-fill"></i>
+        <span>Transação criada com sucesso</span>
+    </div>
+
+    <section class="historico-transacoes">
+        <h2>Histórico de Transações</h2>
+        <div *ngIf="historicoCarregado && transacoesFiltradas.length > 0">
+            <div class="card-transacao" *ngFor="let t of transacoesFiltradas">
+                <div class="card-componentes">
+                    <span>
+                        <i class="bi"
+                            [ngClass]="t.tipo === 'entrada' ? 'bi-arrow-up-right receita' : 'bi-arrow-down-right despesa'"></i>
+                    </span>
+                    <span class="infos-trans">
+                        <h4 class="titulo-transacao">{{ t.descricao }}</h4>
+                        <span class="categoria-transacao">{{ t.categoria_nome }}</span>
+                        <span class="data-transacao categoria-transacao">{{ t.data | date:'dd/MM/yyyy' }}</span>
+                    </span>
+                </div>
+                <span class="valor-transacao" [ngClass]="t.tipo === 'entrada' ? 'receita' : 'despesa'">R$ {{ t.valor |
+                    number:'1.2-2' }}</span>
+                <span class="card-actions">
+                    <button class="btn btn-link" title="Editar" (click)="abrirEditar(t)"><i class="bi bi-pencil-fill"></i></button>
+                    <button class="btn btn-link" title="Apagar" (click)="apagar(t)"><i class="bi bi-trash-fill"></i></button>
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overlay Modal Nova Transação -->
+    <div class="overlay" *ngIf="showModal">
+        <div class="modal">
+            <h3>Nova Transação</h3>
+            <form (ngSubmit)="salvarTransacao()">
+                <div class="form-row">
+                    <label>Tipo</label>
+                    <select [(ngModel)]="form.tipo" name="tipo" required>
+                        <option value="entrada">Entrada</option>
+                        <option value="saida">Saída</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Descrição</label>
+                    <input type="text" [(ngModel)]="form.descricao" name="descricao"
+                        placeholder="Ex.: Salário, Conta de luz" required />
+                </div>
+
+                <div class="form-row">
+                    <label>Valor (R$)</label>
+                    <input type="number" step="0.01" min="0" [(ngModel)]="form.valor" name="valor" required />
+                </div>
+
+                <div class="form-row">
+                    <label>Data</label>
+                    <input type="date" [(ngModel)]="form.data" name="data" required />
+                </div>
+
+                <div class="form-row">
+                    <label>Parcelas</label>
+                    <input type="number" min="1" [(ngModel)]="form.parcelas" name="parcelas" />
+                </div>
+
+                <div class="form-row">
+                    <label>Vencimento (opcional)</label>
+                    <input type="date" [(ngModel)]="form.vencimento" name="vencimento" />
+                </div>
+
+                <div class="form-row">
+                    <label>Pago</label>
+                    <input type="checkbox" [(ngModel)]="form.pago" name="pago" />
+                </div>
+
+                <div class="form-row">
+                    <label>Categoria</label>
+                    <select #categoriaSelect [(ngModel)]="form.categoria" name="categoria" required>
+                        <option [value]="0" disabled>Selecione...</option>
+                        <option *ngFor="let c of categorias" [value]="c.id">{{ c.nome }} ({{ c.tipo_categoria }})
+                        </option>
+                    </select>
+                    <div class="mini-actions">
+                        <button type="button" class="btn btn-link" (click)="toggleNovaCategoria()" title="Nova categoria"><i class="bi bi-plus-circle"></i></button>
+                        <button type="button" class="btn btn-link" (click)="abrirEditarCategoria()" title="Editar categoria"><i class="bi bi-pencil-fill"></i></button>
+                        <button type="button" class="btn btn-link" (click)="abrirExcluirCategoria()" title="Excluir categoria"><i class="bi bi-trash-fill"></i></button>
+                    </div>
+                    <div class="novo-item inline-form" *ngIf="showNovaCategoria">
+                        <div class="form-row">
+                            <label>Tipo</label>
+                            <select [(ngModel)]="novaCategoria.tipo_categoria" name="novaCategoriaTipo">
+                                <option value="entrada">Entrada</option>
+                                <option value="saida">Saída</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label>Nome</label>
+                            <input type="text" [(ngModel)]="novaCategoria.nome" name="novaCategoriaNome"
+                                placeholder="Ex.: Salário" />
+                        </div>
+                        <div class="actions">
+                            <button type="button" class="btn" (click)="toggleNovaCategoria()">Cancelar</button>
+                            <button type="button" class="btn btn-adicionar" (click)="criarCategoriaInline()"
+                                [disabled]="loading">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label>Conta</label>
+                    <select #contaSelect [(ngModel)]="form.conta" name="conta" required>
+                        <option [value]="0" disabled>Selecione...</option>
+                        <option *ngFor="let conta of contas" [value]="conta.id">{{ conta.nome }}</option>
+                    </select>
+                    <div class="mini-actions">
+                        <button type="button" class="btn btn-link" (click)="toggleNovaConta()" title="Nova conta"><i class="bi bi-plus-circle"></i></button>
+                        <button type="button" class="btn btn-link" (click)="abrirEditarConta()" title="Editar conta"><i class="bi bi-pencil-fill"></i></button>
+                        <button type="button" class="btn btn-link" (click)="abrirExcluirConta()" title="Excluir conta"><i class="bi bi-trash-fill"></i></button>
+                    </div>
+                    <div class=" novo-item inline-form" *ngIf="showNovaConta">
+                        <div class="form-row">
+                            <label>Nome</label>
+                            <input type="text" [(ngModel)]="novaConta.nome" name="novaContaNome"
+                                placeholder="Ex.: Carteira" />
+                        </div>
+                        <div class="form-row">
+                            <label>Saldo inicial (opcional)</label>
+                            <input type="number" step="0.01" min="0" [(ngModel)]="novaConta.saldo_inicial"
+                                name="novaContaSaldo" />
+                        </div>
+                        <div class="actions">
+                            <button type="button" class="btn" (click)="toggleNovaConta()">Cancelar</button>
+                            <button type="button" class="btn btn-adicionar" (click)="criarContaInline()"
+                                [disabled]="loading">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="btn" (click)="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Salvar</button>
+                </div>
+                <div class="erro" *ngIf="error">{{ error }}</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay Editar Transação -->
+    <div class="overlay" *ngIf="showEditModal">
+        <div class="modal">
+            <h3>Editar Transação</h3>
+            <form (ngSubmit)="salvarEdicao()">
+                <div class="form-row">
+                    <label>Tipo</label>
+                    <select [(ngModel)]="editForm.tipo" name="edit_tipo" required>
+                        <option value="entrada">Entrada</option>
+                        <option value="saida">Saída</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Descrição</label>
+                    <input type="text" [(ngModel)]="editForm.descricao" name="edit_descricao" required />
+                </div>
+                <div class="form-row">
+                    <label>Valor (R$)</label>
+                    <input type="number" step="0.01" min="0" [(ngModel)]="editForm.valor" name="edit_valor" required />
+                </div>
+                <div class="form-row">
+                    <label>Data</label>
+                    <input type="date" [(ngModel)]="editForm.data" name="edit_data" required />
+                </div>
+                <div class="form-row">
+                    <label>Parcelas</label>
+                    <input type="number" min="1" [(ngModel)]="editForm.parcelas" name="edit_parcelas" />
+                </div>
+                <div class="form-row">
+                    <label>Vencimento (opcional)</label>
+                    <input type="date" [(ngModel)]="editForm.vencimento" name="edit_vencimento" />
+                </div>
+                <div class="form-row">
+                    <label>Pago</label>
+                    <input type="checkbox" [(ngModel)]="editForm.pago" name="edit_pago" />
+                </div>
+                <div class="form-row">
+                    <label>Categoria</label>
+                    <select [(ngModel)]="editForm.categoria" name="edit_categoria" required>
+                        <option *ngFor="let c of categorias" [value]="c.id">{{ c.nome }} ({{ c.tipo_categoria }})</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Conta</label>
+                    <select [(ngModel)]="editForm.conta" name="edit_conta" required>
+                        <option *ngFor="let conta of contas" [value]="conta.id">{{ conta.nome }}</option>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="cancelarEdicao()">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Salvar</button>
+                </div>
+                <div class="erro" *ngIf="error">{{ error }}</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay Editar Categoria -->
+    <div class="overlay" *ngIf="showEditCategoriaModal">
+        <div class="modal modal-small">
+            <h3>Editar Categoria</h3>
+            <form (ngSubmit)="salvarEdicaoCategoria()">
+                <div class="form-row">
+                    <label>Selecionar</label>
+                    <select [(ngModel)]="editCategoriaForm.id" name="edit_cat_id" (ngModelChange)="onSelectEditCategoria($event)">
+                        <option *ngFor="let c of categorias" [value]="c.id">{{ c.nome }} ({{ c.tipo_categoria }})</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Nome</label>
+                    <input type="text" [(ngModel)]="editCategoriaForm.nome" name="edit_cat_nome" required />
+                </div>
+                <div class="form-row">
+                    <label>Tipo</label>
+                    <select [(ngModel)]="editCategoriaForm.tipo_categoria" name="edit_cat_tipo">
+                        <option value="entrada">Entrada</option>
+                        <option value="saida">Saída</option>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="showEditCategoriaModal=false">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Salvar</button>
+                </div>
+                <div class="inline-confirm" *ngIf="showMsgEditCategoria" style="margin-top:8px; color:#28a745; display:flex; align-items:center; gap:6px;">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Categoria atualizada com sucesso</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay Excluir Categoria -->
+    <div class="overlay" *ngIf="showDeleteCategoriaModal">
+        <div class="modal modal-small">
+            <h3>Excluir Categoria</h3>
+            <form (ngSubmit)="confirmarExcluirCategoria()">
+                <div class="form-row">
+                    <label>Selecionar</label>
+                    <select [(ngModel)]="editCategoriaForm.id" name="del_cat_id" (ngModelChange)="onSelectEditCategoria($event)">
+                        <option *ngFor="let c of categorias" [value]="c.id">{{ c.nome }} ({{ c.tipo_categoria }})</option>
+                    </select>
+                </div>
+                <p>Deseja realmente excluir a categoria "{{ editCategoriaForm.nome }}"?</p>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="cancelarExcluirCategoria()">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Confirmar</button>
+                </div>
+                <div class="inline-confirm" *ngIf="showMsgDeleteCategoria" style="margin-top:8px; color:#28a745; display:flex; align-items:center; gap:6px;">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Categoria excluída com sucesso</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay Editar Conta -->
+    <div class="overlay" *ngIf="showEditContaModal">
+        <div class="modal modal-small">
+            <h3>Editar Conta</h3>
+            <form (ngSubmit)="salvarEdicaoConta()">
+                <div class="form-row">
+                    <label>Selecionar</label>
+                    <select [(ngModel)]="editContaForm.id" name="edit_conta_id" (ngModelChange)="onSelectEditConta($event)">
+                        <option *ngFor="let conta of contas" [value]="conta.id">{{ conta.nome }}</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Nome</label>
+                    <input type="text" [(ngModel)]="editContaForm.nome" name="edit_conta_nome" required />
+                </div>
+                <div class="form-row">
+                    <label>Saldo inicial (opcional)</label>
+                    <input type="number" step="0.01" min="0" [(ngModel)]="editContaForm.saldo_inicial" name="edit_conta_saldo" />
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="showEditContaModal=false">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Salvar</button>
+                </div>
+                <div class="inline-confirm" *ngIf="showMsgEditConta" style="margin-top:8px; color:#28a745; display:flex; align-items:center; gap:6px;">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Conta atualizada com sucesso</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay Excluir Conta -->
+    <div class="overlay" *ngIf="showDeleteContaModal">
+        <div class="modal modal-small">
+            <h3>Excluir Conta</h3>
+            <form (ngSubmit)="confirmarExcluirConta()">
+                <div class="form-row">
+                    <label>Selecionar</label>
+                    <select [(ngModel)]="editContaForm.id" name="del_conta_id" (ngModelChange)="onSelectEditConta($event)">
+                        <option *ngFor="let conta of contas" [value]="conta.id">{{ conta.nome }}</option>
+                    </select>
+                </div>
+                <p>Deseja realmente excluir a conta "{{ editContaForm.nome }}"?</p>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="cancelarExcluirConta()">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loading">Confirmar</button>
+                </div>
+                <div class="inline-confirm" *ngIf="showMsgDeleteConta" style="margin-top:8px; color:#28a745; display:flex; align-items:center; gap:6px;">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Conta excluída com sucesso</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay Confirmar Exclusão -->
+    <div class="overlay" *ngIf="showDeleteModal">
+        <div class="modal modal-small">
+            <h3>Apagar Transação</h3>
+            <p>Tem certeza que deseja apagar esta transação?</p>
+            <div class="actions">
+                <button type="button" class="btn" (click)="cancelarApagar()">Cancelar</button>
+                <button type="button" class="btn btn-adicionar" (click)="confirmarApagar()" [disabled]="loading">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+</main>
+<app-footer></app-footer>
