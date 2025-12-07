@@ -33,6 +33,7 @@ from .services import (
     criar_incentivo_conclusao,
     liberar_incentivo_conclusao,
     criar_incentivo_enem,
+    criar_parcela_pede_meia,
 )
 from rest_framework.views import APIView
 
@@ -106,6 +107,33 @@ class IncentivoEnemCreateView(APIView):
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+class IncentivoParcelaCreateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            mes = int(request.data.get('mes'))
+            ano = int(request.data.get('ano'))
+            valor = float(request.data.get('valor'))
+        except (TypeError, ValueError):
+            return Response({'detail': 'Campos "mes", "ano" e "valor" são obrigatórios e válidos.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        conta_id = request.data.get('conta_id')
+        categoria_nome = request.data.get('categoria') or 'Pé de Meia'
+
+        conta = None
+        if conta_id:
+            try:
+                conta = Conta.objects.get(id=conta_id, usuario=request.user)
+            except Conta.DoesNotExist:
+                return Response({'detail': 'Conta inválida.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            transacao = criar_parcela_pede_meia(request.user, mes, ano, valor, conta, categoria_nome)
+            return Response({'transacao_id': transacao.id, 'valor': float(transacao.valor), 'data': transacao.data.isoformat()}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 class TransacaoViewSet(viewsets.ModelViewSet):
     serializer_class = TransacaoSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwner]
@@ -120,7 +148,14 @@ class TransacaoViewSet(viewsets.ModelViewSet):
         serializer.save(usuario=self.request.user)
 
     def perform_update(self, serializer):
-        serializer.save(usuario=self.request.user)
+        instance = serializer.save(usuario=self.request.user)
+        from .services_incentivo import atualizar_incentivo_por_transacao
+        atualizar_incentivo_por_transacao(instance)
+
+    def perform_destroy(self, instance):
+        from .services_incentivo import excluir_incentivo_por_transacao
+        excluir_incentivo_por_transacao(instance)
+        instance.delete()
 
     @action(detail=False, methods=['get'])
     def resumo_financeiro(self, request):
@@ -157,7 +192,7 @@ class TransacaoViewSet(viewsets.ModelViewSet):
         pede_meia_qs = Transacao.objects.filter(
             usuario=user,
             tipo='entrada',
-            descricao__icontains="Pé-de-Meia"
+            categoria__nome__iexact="Pé de Meia"
         )
         
         total_pede_meia_recebido = pede_meia_qs.filter(pago=True).aggregate(Sum('valor'))['valor__sum'] or 0

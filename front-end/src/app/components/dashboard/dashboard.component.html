@@ -1,83 +1,163 @@
 <app-header></app-header>
 
-    <main>
-        <h1>Dashboard Financeiro</h1>
-        <div class="container-valor-recebido">
-            <div class="container-valor-recebido-cabecalho">
-                <span>
-                    <i class="bi bi-mortarboard icone"></i>
-                </span>
-                <p>Programa Pé de Meia</p>
-            </div>
-
-            <div class="total-beneficio">
-                <h3>Total acumulado</h3>
-                <div class="total-beneficio-recebido">R$ 4.400,00</div>
-                <div class="total-beneficio-mensal"><i class="bi bi-arrow-up-right"></i> +R$ 200,00 p/ mês</div>
-            </div>
+<main>
+    <section class="container-funcionalidades">
+        <div class="cabecalho">
+            <span>
+                <h1>Dashboard Financeiro</h1>
+            </span>
+            <span class="acoes">
+                <button class="btn btn-adicionar" (click)="openContaModal()"><i class="bi bi-plus-circle-fill"></i> Nova Conta</button>
+            </span>
+        </div>
+    </section>
+    <div class="container-valor-recebido">
+        <div class="container-valor-recebido-cabecalho">
+            <span>
+                <i class="bi bi-mortarboard icone"></i>
+            </span>
+            <p>Programa Pé de Meia</p>
         </div>
 
+
+        <div class="total-beneficio">
+            <h3>Total acumulado</h3>
+            <div class="total-beneficio-recebido">
+                <ng-container *ngIf="!loadingBeneficio; else carregandoTotal">R$ {{ totalBeneficioRecebido |
+                        number:'1.2-2' }}</ng-container>
+                    <ng-template #carregandoTotal>Carregando...</ng-template>
+                </div>
+            </div>
+            <div class="incentivos-flex">
+            <div>
+                <h4 class="total-beneficio-mensal">Parcela Mensal</h4>
+                <div class="acoes" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <button (click)="confirmarParcelaMesAtual()" class="btn btn-adicionar">
+                        Confirmar Recebimento
+                    </button>
+                </div>
+            </div>
+            <div>
+                <h4 class="total-beneficio-mensal">Incentivo Conclusão</h4>
+                <div class="acoes" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <button (click)="criarELiberarIncentivoConclusao()" class="btn btn-adicionar">
+                        Confirmar Recebimento
+                    </button>
+                </div>
+            </div>
+            <div>
+                <h4 class="total-beneficio-mensal">Incentivo ENEM</h4>
+                <div class="acoes" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <button (click)="criarIncentivoEnem()" class="btn btn-adicionar">Confirmar Recebimento</button>
+                </div>
+            </div>
+        </div>
+    </div>
         <section class="total-transacoes">
             <div class="card">
                 <h3>Saldo Total <i class="bi bi-wallet2"></i></h3>
-                <div>R$ 1.300</div>
-                <span class="percentual-variavel"><i class="bi bi-arrow-up-right"></i> +12% em relação ao mês passado</span>
+                <div>R$ {{saldoLiquido}}</div>
+                <p>Valor Líquido</p>
             </div>
-
+            
             <div class="card">
                 <h3>Receitas <i class="bi bi-arrow-up-right receita"></i></h3>
-                <div class="receita">R$ 5.800</div>
-                <p>Entradas do mês</p>
+                <div class="receita">R$ {{totalEntradas}}</div>
+                <p>Total Entradas</p>
             </div>
 
             <div class="card">
                 <h3>Despesas <i class="bi bi-arrow-down-right despesa"></i></h3>
-                <div class="despesa">R$ 4.500</div>
-                <p>Saídas do mês</p>
+                <div class="despesa">R$ {{totalSaidas}}</div>
+                <p>Total Saídas</p>
             </div>
         </section>
 
         <section class="detalhes-transacoes">
-            <div class="card">
-                <h2 class="titulo">Evolução Mensal</h2>
-                <div>
-                    Inserir Gráfico de Receitas e Despesas mensais
+            <div class="card" style="flex:1; min-width:280px;">
+                <h2 class="titulo">Entradas por Categoria</h2>
+                <div class="grafico_entradas-categoria">
+                    <ng-container *ngIf="entradasCategoria.length; else vazioEntradas">
+                        <div *ngFor="let e of entradasCategoria | slice:0:6"
+                            style="display:flex; align-items:center; gap:8px; margin:6px 0;">
+                            <span class="cate-grafico">{{ e.categoria__nome }}</span>
+                            <div class="barra-grafico">
+                                <div [style.width.%]="(e.total / (totalEntradas || 1)) * 100"
+                                    style="background: var(--cor-terciaria); height:100%;"></div>
+                            </div>
+                            <span class="valor-grafico">R$ {{ e.total | number:'1.2-2' }}</span>
+                        </div>
+                    </ng-container>
+                    <ng-template #vazioEntradas><span style="color:#7f8c8d;">Sem dados de entradas.</span></ng-template>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card" style="flex:1; min-width:280px;">
                 <h2 class="titulo">Despesas por Categoria</h2>
-                <div>
-                    Inserir Gráfico de Despesas por categoria mensais
+                <div class="grafico_saidas-categoria">
+                    <ng-container *ngIf="gastosCategoria.length; else vazioDespesas">
+                        <div *ngFor="let g of gastosCategoria | slice:0:6"
+                            style="display:flex; align-items:center; gap:8px; margin:6px 0;">
+                            <span class="cate-grafico">{{ g.categoria__nome }}</span>
+                            <div class="barra-grafico">
+                                <div [style.width.%]="(g.total / (totalSaidas || 1)) * 100"
+                                    style="background:#e74c3c; height:100%;"></div>
+                            </div>
+                            <span class="valor-grafico">R$ {{ g.total | number:'1.2-2' }}</span>
+                        </div>
+                    </ng-container>
+                    <ng-template #vazioDespesas><span style="color:#7f8c8d;">Sem dados de despesas.</span></ng-template>
                 </div>
             </div>
         </section>
 
         <section class="card historico-transacoes">
             <h2 class="titulo">Últimas Transações</h2>
-            <div class="card-transacao">
-                <div>
-                    <span><i class="bi bi-arrow-up-right receita"></i></span>
-                    <span>
-                        <h4 class="titulo-transacao">Salário</h4>
-                        <span class="categoria-transacao">Salário</span>
-                        <span class="categoria-transacao">06/11/2025</span>
-                    </span>
+            <ng-container *ngIf="transacoesRecentes.length; else semTransacoes">
+                <div class="card-transacao" *ngFor="let t of transacoesRecentes">
+                    <div>
+                        <span>
+                            <i class="bi"
+                                [ngClass]="t.tipo === 'entrada' ? 'bi-arrow-up-right receita' : 'bi-arrow-down-right despesa'"></i>
+                        </span>
+                        <span class="infos-trans">
+                            <h4 class="titulo-transacao">{{ t.descricao }}</h4>
+                            <span class="categoria-transacao">{{ t.categoria__nome }}</span>
+                            <span class="categoria-transacao">{{ t.data | date:'dd/MM/yyyy' }}</span>
+                        </span>
+                    </div>
+                    <span class="valor-transacao" [ngClass]="t.tipo === 'entrada' ? 'receita' : 'despesa'">R$ {{ t.valor
+                        |
+                        number:'1.2-2' }}</span>
                 </div>
-                <span class="valor-transacao receita">R$ 1.000</span>
-            </div>
-            <div class="card-transacao">
-                <div>
-                    <span><i class="bi bi-arrow-down-right despesa"></i></span>
-                    <span>
-                        <h4 class="titulo-transacao">Conta de Luz</h4>
-                        <span class="categoria-transacao">Moradia</span>
-                        <span class="categoria-transacao">10/11/2025</span>
-                    </span>
-                </div>
-                <span class="valor-transacao despesa">R$ 250</span>
-            </div>
+            </ng-container>
+            <ng-template #semTransacoes>
+                <div style="color:#7f8c8d;">Sem transações recentes.</div>
+            </ng-template>
         </section>
-    </main>
-    
-<app-footer></app-footer>
+
+    <!-- Overlay Modal Nova Conta -->
+    <div class="overlay" *ngIf="showContaModal">
+        <div class="modal">
+            <h3>Nova Conta</h3>
+            <form (ngSubmit)="salvarConta()">
+                <div class="form-row">
+                    <label>Nome</label>
+                    <input type="text" [(ngModel)]="novaConta.nome" name="novaContaNome" placeholder="Ex.: Carteira" required />
+                </div>
+                <div class="form-row">
+                    <label>Saldo inicial (opcional)</label>
+                    <input type="number" step="0.01" min="0" [(ngModel)]="novaConta.saldo_inicial" name="novaContaSaldo" />
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn" (click)="closeContaModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-adicionar" [disabled]="loadingConta">Salvar</button>
+                </div>
+                <div class="erro" *ngIf="errorConta">{{ errorConta }}</div>
+            </form>
+        </div>
+    </div>
+</main>
+
+        
+        <app-footer></app-footer>

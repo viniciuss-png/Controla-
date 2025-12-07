@@ -1,3 +1,161 @@
+/* Overlay e modal padrão igual transações */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.35);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.modal {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+    padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+    max-width: 250px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    border: 1.5px solid var(--cor-terciaria, #8ed652);
+}
+.modal h3{
+    text-align: center;
+    color: var(--cor-terciaria, #8ed652);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+.form-row label {
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: #2c3e50;
+}
+.form-row input {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 1rem;
+    outline: none;
+    background: #f8fafc;
+    transition: border 0.2s;
+}
+.form-row input:focus {
+    border: 1.5px solid var(--cor-terciaria, #8ed652);
+    background: #fff;
+}
+.actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+.actions .btn {
+    min-width: 90px;
+    font-size: 1rem;
+    border-radius: 0.7rem;
+    font-weight: 600;
+    background: #f3f3f3;
+    color: #2c3e50;
+    border: 1px solid #d1d5db;
+    transition: background 0.2s;
+}
+.actions .btn-adicionar {
+    background: var(--cor-terciaria, #8ed652);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+}
+.actions .btn-adicionar:hover {
+    background: #6bbf3c;
+}
+.actions .btn:hover {
+    background: #e1e1e1;
+}
+.erro {
+    color: #b00020;
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 1rem;
+}
+.incentivos-flex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .incentivos-flex {
+        flex-direction: row;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+}
+.cabecalho{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.bloco-incentivo {
+    background: #fff;
+    border-radius: 0.7rem;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.1rem;
+}
+.bloco-incentivo {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 220px;
+    max-width: 350px;
+    border: 1px solid #e1e1e1;
+    transition: box-shadow 0.2s;
+}
+
+.bloco-incentivo:hover {
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.15);
+}
+
+.incentivos-container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(44, 62, 80, 0.05);
+}
+
+.incentivos-container h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-top: 1.2rem;
+    margin-bottom: 0.7rem;
+}
+
+.btn-adicionar-mini:hover {
+    background: #6bbf3c;
+}
 body {
     width: 100%;
     background-color:#dfffc5;
@@ -66,6 +224,8 @@ h1{
 
 .total-beneficio-mensal{
     font-size: 1rem;
+    color:white;
+    font-weight: 700;
 }
 
 .total-transacoes{
@@ -87,11 +247,6 @@ h1{
     font-size: 1.7rem;
     font-weight: 800;
     margin: 0.5rem 0;
-}
-
-.percentual-variavel{
-    font-size: 0.8rem;
-    color: green;
 }
 
 .receita{
@@ -124,6 +279,12 @@ h1{
     align-items: center;
 }
 
+.infos-trans {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
 .titulo-transacao{
     color: black;
     font-size: 1rem;
@@ -152,4 +313,29 @@ h1{
     .historico-transacoes{
         width: 60%;
     }
+}
+
+/* Ações do dashboard (confirmar parcela) */
+.acoes .btn.btn-adicionar {
+    background: var(--cor-terciaria);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: opacity 0.2s;
+    border: none;
+}
+.valor-grafico {
+    font-size: 18px;
+    text-align: right;
+}
+.barra-grafico {
+    flex: 1;
+    background: #ecf0f1;
+    border-radius: 6px;
+    height: 14px;
+    overflow: hidden;
+}
+.cate-grafico {
+    font-size: 14px;
+    color: #2c3e50;
 }

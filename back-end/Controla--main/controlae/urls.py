@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from core.views import TransacaoViewSet, CategoriaViewSet, ContaViewSet, UserRegisterView, MetaFinanceiraViewSet, LembreteViewSet, NotificacaoViewSet
-from core.views import IncentivoConclusaoCreateView, IncentivoConclusaoLiberarView, IncentivoEnemCreateView
+from core.views import IncentivoConclusaoCreateView, IncentivoConclusaoLiberarView, IncentivoEnemCreateView, IncentivoParcelaCreateView
 from core.views import RelatorioFinanceiroPDFView, DashboardDataView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -32,6 +32,7 @@ urlpatterns = [
     path('api/incentivos/conclusao/', IncentivoConclusaoCreateView.as_view(), name='incentivo_conclusao_create'),
     path('api/incentivos/conclusao/liberar/', IncentivoConclusaoLiberarView.as_view(), name='incentivo_conclusao_liberar'),
     path('api/incentivos/enem/', IncentivoEnemCreateView.as_view(), name='incentivo_enem_create'),
+    path('api/incentivos/parcela/', IncentivoParcelaCreateView.as_view(), name='incentivo_parcela_create'),
     path('api/relatorio/pdf/', RelatorioFinanceiroPDFView.as_view(), name='relatorio_pdf'),
     path('api/dashboard/', DashboardDataView.as_view(), name='dashboard_data'),
 ]

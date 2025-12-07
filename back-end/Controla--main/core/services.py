@@ -127,7 +127,7 @@ def confirmar_recebimento_pede_meia(usuario, mes: int, ano: int):
         pago=False,
         data__month=mes,
         data__year=ano,
-        descricao__icontains="Pé-de-Meia"
+        categoria__nome__iexact="Pé de Meia"
     ).order_by('data').first()
 
     if not transacao:
@@ -137,6 +137,64 @@ def confirmar_recebimento_pede_meia(usuario, mes: int, ano: int):
 
     transacao.pago = True
     transacao.save()  
+
+    return transacao
+
+
+@transaction.atomic
+def criar_parcela_pede_meia(usuario, mes: int, ano: int, valor: float, conta: Conta = None, categoria_nome: str = "Pé de Meia"):
+    """Cria uma transação de entrada pendente para uma parcela mensal do Pé-de-Meia.
+    - descricao contém "Pé-de-Meia - MM/AAAA"
+    - pago=False
+    """
+    if not (1 <= mes <= 12):
+        raise ConfirmacaoRecebimentoError("Mês deve estar entre 1 e 12.")
+    if ano < 2000 or ano > 2100:
+        raise ConfirmacaoRecebimentoError("Ano inválido.")
+
+    # Evita duplicar: já existe parcela (paga ou pendente) neste mês/ano
+    existente = Transacao.objects.filter(
+        usuario=usuario,
+        tipo='entrada',
+        data__month=mes,
+        data__year=ano,
+        categoria__nome__iexact="Pé de Meia"
+    ).exists()
+    if existente:
+        raise ConfirmacaoRecebimentoError("A parcela do mês atual já foi registrada.")
+
+    if conta is None:
+        conta = Conta.objects.filter(usuario=usuario).order_by('id').first()
+    if not conta:
+        raise ConfirmacaoRecebimentoError("Nenhuma conta encontrada para creditar a parcela.")
+
+    categoria = _obter_ou_criar_categoria(usuario, categoria_nome, 'entrada')
+    # Registrar o dia real de criação da transação
+    data_criacao = timezone.localdate()
+
+    transacao = Transacao.objects.create(
+        usuario=usuario,
+        conta=conta,
+        categoria=categoria,
+        tipo='entrada',
+        valor=Decimal('200.00'),
+        data=data_criacao,
+        descricao="Parcela Mensal",
+        pago=False,
+        parcelas=1,
+        vencimento=None,
+    )
+
+    # Registrar também o incentivo na tabela Incentivo
+    incentivo = Incentivo.objects.create(
+        usuario=usuario,
+        tipo='pede_meia',
+        ano=ano,
+        valor=Decimal('200.00'),
+        conta=conta,
+        transacao=transacao,
+        liberado=True,
+    )
 
     return transacao
 
@@ -203,6 +261,10 @@ def criar_incentivo_enem(usuario, conta: Conta = None, ano: int = None):
 
     if not conta:
         raise DepositoMetaError("Nenhuma conta encontrada para creditar o incentivo ENEM.")
+
+    # Verifica se já existe incentivo ENEM liberado para o ano
+    if Incentivo.objects.filter(usuario=usuario, tipo='enem', ano=ano).exists():
+        raise DepositoMetaError(f"O benefício ENEM já foi recebido no ano {ano}.")
 
     categoria = _obter_ou_criar_categoria(usuario, "Incentivo ENEM", "entrada")
     hoje = timezone.localdate()
@@ -271,11 +333,14 @@ def gerar_relatorio_financeiro_pdf(usuario, from_date=None, to_date=None):
         .order_by('-total')
     )
     
-    # Entradas Pé-de-Meia
+    # Entradas Pé-de-Meia (recebidas)
     total_pede_meia = (
-        Transacao.objects.filter(usuario=usuario, tipo='entrada', 
-                                 descricao__icontains="Pé-de-Meia", pago=True)
-        .aggregate(Sum('valor'))['valor__sum'] or 0
+        Transacao.objects.filter(
+            usuario=usuario,
+            tipo='entrada',
+            pago=True,
+            categoria__nome__iexact="Pé de Meia"
+        ).aggregate(Sum('valor'))['valor__sum'] or 0
     )
     
     # Saldos por conta
@@ -498,17 +563,35 @@ def obter_dados_dashboard(usuario, from_date=None, to_date=None):
         .order_by('-total')
     )
     
-    # Pé-de-Meia
+    # Pé-de-Meia + Incentivo Conclusão
     pede_meia_recebido = (
-        Transacao.objects.filter(usuario=usuario, tipo='entrada', 
-                                 descricao__icontains="Pé-de-Meia", pago=True)
-        .aggregate(Sum('valor'))['valor__sum'] or Decimal('0')
+        Transacao.objects.filter(
+            usuario=usuario,
+            tipo='entrada',
+            pago=True,
+            categoria__nome__in=["Pé de Meia", "Incentivo Conclusão", "Incentivo ENEM"]
+        ).aggregate(Sum('valor'))['valor__sum'] or Decimal('0')
     )
     
     pede_meia_pendente = (
-        Transacao.objects.filter(usuario=usuario, tipo='entrada',
-                                 descricao__icontains="Pé-de-Meia", pago=False)
-        .aggregate(Sum('valor'))['valor__sum'] or Decimal('0')
+        Transacao.objects.filter(
+            usuario=usuario,
+            tipo='entrada',
+            pago=False,
+            categoria__nome__iexact="Pé de Meia"
+        ).aggregate(Sum('valor'))['valor__sum'] or Decimal('0')
+    )
+
+    # Última transação de Pé-de-Meia (para exibir junto dos incentivos)
+    pede_meia_ultima = (
+        Transacao.objects.filter(
+            usuario=usuario,
+            tipo='entrada',
+            categoria__nome__iexact="Pé de Meia"
+        )
+        .values('id', 'data', 'descricao', 'valor', 'pago', 'categoria__nome')
+        .order_by('-data', '-id')
+        .first()
     )
     
     # Incentivos
@@ -567,6 +650,7 @@ def obter_dados_dashboard(usuario, from_date=None, to_date=None):
         "incentivos": {
             "conclusao": convert_decimals(incentivos_conclusao),
             "enem": convert_decimals(incentivos_enem),
+            "pede_meia": convert_decimals(pede_meia_ultima) if pede_meia_ultima else None,
         },
         "contas": convert_decimals(saldos_contas),
         "metas": convert_decimals(metas),

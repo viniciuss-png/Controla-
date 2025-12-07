@@ -32,7 +32,6 @@
                 <input type="password" formControlName="password" placeholder="Senha">
             </div>
             <button type="submit" class="botao botao-entrar" [disabled]="loading || form.invalid">Entrar</button>
-            <div class="msg-erro" *ngIf="errorMsg">{{ errorMsg }}</div>
         </form>
 
         <a routerLink="/cadastrar" class="botao botao-cadastrar">Cadastrar</a>

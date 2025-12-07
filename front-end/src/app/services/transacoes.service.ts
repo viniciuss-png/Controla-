@@ -53,6 +53,38 @@ export interface LembretePayload {
   ativo?: boolean;
 }
 
+export interface ResumoFinanceiro {
+  saldo_liquido: number;
+  total_entradas: number;
+  total_saidas: number;
+  pede_meia_recebido: number; // soma total recebida do Pé-de-Meia (pago=true)
+  parcelas_pendentes: Array<{ data: string; valor: number; descricao: string }>;
+  saldos_por_conta: Array<{ id: number; nome: string; saldo_atual: number }>;
+  gastos_por_categoria?: Array<{ categoria__nome: string; total: number }>; // opcional
+}
+
+export interface DashboardData {
+  resumo: {
+    total_entradas: number;
+    total_saidas: number;
+    saldo_liquido: number;
+    pede_meia_recebido: number;
+    pede_meia_pendente: number;
+  };
+  graficos: {
+    gastos_categoria: Array<{ categoria__nome: string; total: number }>;
+    entradas_categoria: Array<{ categoria__nome: string; total: number }>;
+  };
+  incentivos: {
+    conclusao: Array<{ id: number; ano: number; valor: number; liberado: boolean; criado_em: string }>;
+    enem: Array<{ id: number; ano: number; valor: number; liberado: boolean; criado_em: string }>;
+    pede_meia?: { id: number; data: string; descricao: string; valor: number; pago: boolean; categoria__nome: string } | null;
+  };
+  contas: Array<{ id: number; nome: string; saldo_inicial: number; saldo_atual: number }>;
+  metas: Array<{ id: number; nome: string; valor_alvo: number; data_alvo: string; ativa: boolean }>;
+  transacoes_recentes: Array<{ id: number; data: string; tipo: string; descricao: string; valor: number; categoria__nome: string; pago: boolean }>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TransacoesService {
   private http = inject(HttpClient);
@@ -146,5 +178,83 @@ export class TransacoesService {
   }
   apagarLembrete(id: number) {
     return this.http.delete(`${this.baseUrl}/lembretes/${id}/`, { headers: this.authHeaders() });
+  }
+
+  // Dashboard / Pé-de-Meia
+  getResumoFinanceiro(params?: { from_date?: string; to_date?: string }) {
+    let httpParams = new HttpParams();
+    if (params?.from_date) httpParams = httpParams.set('from_date', params.from_date);
+    if (params?.to_date) httpParams = httpParams.set('to_date', params.to_date);
+    return this.http.get<ResumoFinanceiro>(`${this.baseUrl}/transacoes/resumo_financeiro/`, {
+      headers: this.authHeaders(),
+      params: httpParams,
+    });
+  }
+
+  // Dashboard consolidado
+  getDashboardData(params?: { from_date?: string; to_date?: string }) {
+    let httpParams = new HttpParams();
+    if (params?.from_date) httpParams = httpParams.set('from_date', params.from_date);
+    if (params?.to_date) httpParams = httpParams.set('to_date', params.to_date);
+    return this.http.get<DashboardData>(`${this.baseUrl}/dashboard/`, {
+      headers: this.authHeaders(),
+      params: httpParams,
+    });
+  }
+
+  confirmarRecebimento(body?: { mes?: number; ano?: number }) {
+    const payload: any = {};
+    if (body?.mes) payload.mes = body.mes;
+    if (body?.ano) payload.ano = body.ano;
+    return this.http.post<{ detail: string; transacao_id: number; valor: number }>(
+      `${this.baseUrl}/transacoes/confirmar_recebimento/`,
+      payload,
+      { headers: this.authHeaders() }
+    );
+  }
+
+  // Incentivos: conclusão (liberar)
+  liberarIncentivoConclusao(incentivo_id: number) {
+    return this.http.post<{ id: number; transacao_id: number; valor: number }>(
+      `${this.baseUrl}/incentivos/conclusao/liberar/`,
+      { incentivo_id },
+      { headers: this.authHeaders() }
+    );
+  }
+
+  // Incentivos: criação de conclusão
+  criarIncentivoConclusao(conta_id?: number) {
+    const body: any = {};
+    // Adiciona o ano atual do sistema
+    body.ano = new Date().getFullYear();
+    if (typeof conta_id === 'number') body.conta_id = conta_id;
+    return this.http.post<{ id: number; valor: number; liberado: boolean }>(
+      `${this.baseUrl}/incentivos/conclusao/`,
+      body,
+      { headers: this.authHeaders() }
+    );
+  }
+
+  // Incentivos: criação do ENEM
+  criarIncentivoEnem(ano: number, conta_id?: number) {
+    const body: any = { ano };
+    if (typeof conta_id === 'number') body.conta_id = conta_id;
+    return this.http.post<{ id: number; transacao_id: number; valor: number }>(
+      `${this.baseUrl}/incentivos/enem/`,
+      body,
+      { headers: this.authHeaders() }
+    );
+  }
+
+  // Incentivos: criar parcela mensal pendente (Pé-de-Meia)
+  criarParcelaPedeMeia(mes: number, ano: number, valor: number, conta_id?: number, categoria?: string) {
+    const body: any = { mes, ano, valor };
+    if (typeof conta_id === 'number') body.conta_id = conta_id;
+    if (typeof categoria === 'string') body.categoria = categoria;
+    return this.http.post<{ transacao_id: number; valor: number; data: string }>(
+      `${this.baseUrl}/incentivos/parcela/`,
+      body,
+      { headers: this.authHeaders() }
+    );
   }
 }

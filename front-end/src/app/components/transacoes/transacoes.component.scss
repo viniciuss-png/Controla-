@@ -146,6 +146,12 @@
     color:rgb(73, 73, 73) ;
     font-size: 0.8rem;
 }
+.card-transacao .vazio{
+    gap: 6px;
+}
+.card-transacao .vazio span h4{
+    font-weight: 900;
+}
 .valor-transacao{
     font-size: 1rem;
     text-align: right;

@@ -157,11 +157,32 @@ class Notificacao(models.Model):
         ordering = ['-criada_em']
 
 
+
 class Incentivo(models.Model):
     TIPO_CHOICES = [
         ('conclusao', 'Incentivo Conclusão'),
         ('enem', 'Incentivo ENEM'),
     ]
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    ano = models.IntegerField(null=True, blank=True)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    conta = models.ForeignKey(Conta, null=True, blank=True, on_delete=models.SET_NULL)
+    transacao = models.ForeignKey(Transacao, null=True, blank=True, on_delete=models.SET_NULL)
+    liberado = models.BooleanField(default=False)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Incentivo"
+        verbose_name_plural = "Incentivos"
+        ordering = ['-criado_em']
+
+    def delete(self, *args, **kwargs):
+        # Exclui a transação vinculada, se existir
+        if self.transacao:
+            self.transacao.delete()
+        super().delete(*args, **kwargs)
 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)

@@ -64,8 +64,6 @@
                 <div class="msg-erro" *ngIf="form.errors?.['passwordMismatch']">As senhas não conferem.</div>
 
                 <button class="botao botao-enviar" type="submit" [disabled]="loading || form.invalid">Comece a usar o Controlaê</button>
-                <div class="msg-erro" *ngIf="errorMsg">{{ errorMsg }}</div>
-                <div class="msg-sucesso" *ngIf="successMsg">{{ successMsg }}</div>
             </form>
         </section>
     </main>

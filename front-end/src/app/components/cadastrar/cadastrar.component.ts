@@ -20,10 +20,18 @@ export class CadastrarComponent {
   errorMsg = '';
   successMsg = '';
 
+  private showAlert(type: 'erro' | 'sucesso', msg: string) {
+    if (msg) {
+      window.alert(msg);
+      if (type === 'erro') this.errorMsg = '';
+      if (type === 'sucesso') this.successMsg = '';
+    }
+  }
+
   form = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    username: ['', [Validators.required]],
+    email: ['', [Validators.required]],
+    password: ['', [Validators.required]],
     confirmPassword: ['', [Validators.required]],
     serie_em: [1, [Validators.required]]
   }, { validators: this.passwordsMatchValidator });
@@ -41,9 +49,11 @@ export class CadastrarComponent {
     this.errorMsg = '';
     this.successMsg = '';
     if (this.form.invalid) {
-      this.errorMsg = this.form.errors?.['passwordMismatch']
+      const msg = this.form.errors?.['passwordMismatch']
         ? 'As senhas não conferem.'
         : 'Preencha os campos corretamente.';
+      this.errorMsg = msg;
+      this.showAlert('erro', msg);
       return;
     }
     this.loading = true;
@@ -54,11 +64,27 @@ export class CadastrarComponent {
       next: () => {
         this.successMsg = 'Cadastro realizado com sucesso!';
         this.loading = false;
+        this.showAlert('sucesso', this.successMsg);
         setTimeout(() => this.router.navigateByUrl('/entrar'), 1200);
       },
       error: (err) => {
-        this.errorMsg = err?.error?.detail || 'Falha ao cadastrar.';
+        let msg = 'Falha ao cadastrar.';
+        if (err?.error) {
+          if (typeof err.error === 'string') {
+            msg = err.error;
+          } else if (err.error.detail) {
+            msg = err.error.detail;
+          } else if (err.error.message) {
+            msg = err.error.message;
+          } else {
+            try {
+              msg = JSON.stringify(err.error);
+            } catch {}
+          }
+        }
+        this.errorMsg = msg;
         this.loading = false;
+        this.showAlert('erro', msg);
       }
     });
   }

@@ -32,7 +32,7 @@
 
     <section class="historico-transacoes">
         <h2>Histórico de Transações</h2>
-        <div *ngIf="historicoCarregado && transacoesFiltradas.length > 0">
+        <div *ngIf="historicoCarregado && transacoesFiltradas.length > 0; else vazioHistorico">
             <div class="card-transacao" *ngFor="let t of transacoesFiltradas">
                 <div class="card-componentes">
                     <span>
@@ -53,6 +53,14 @@
                 </span>
             </div>
         </div>
+        <ng-template #vazioHistorico>
+            <div class="card-transacao vazio">
+                <span>
+                    <h4>Nenhuma transação registrada</h4>
+                    <span class="categoria-transacao">Crie sua primeira transação para ver o histórico aqui.</span>
+                </span>
+            </div>
+        </ng-template>
     </section>
 
     <!-- Overlay Modal Nova Transação -->
@@ -80,7 +88,7 @@
                 </div>
 
                 <div class="form-row">
-                    <label>Data</label>
+                    <label>Data de Registro</label>
                     <input type="date" [(ngModel)]="form.data" name="data" required />
                 </div>
 

@@ -465,11 +465,11 @@ export class TransacoesComponent {
     this.loading = true;
     this.svc.criarCategoria(this.novaCategoria).subscribe({
       next: (cat) => {
-        // adiciona à lista e reseta inline para permitir escolher ou criar outra
         this.categorias = [...this.categorias, cat];
         this.novaCategoria = { nome: '', tipo_categoria: 'saida' };
         this.showNovaCategoria = false;
         this.loading = false;
+        window.alert('Categoria criada com sucesso!');
       },
       error: (err) => {
         this.error = err?.error?.nome?.[0] || err?.error?.detail || 'Erro ao criar categoria.';
@@ -486,11 +486,11 @@ export class TransacoesComponent {
     this.loading = true;
     this.svc.criarConta(this.novaConta).subscribe({
       next: (conta) => {
-        // adiciona à lista e reseta inline para permitir escolher ou criar outra
         this.contas = [...this.contas, conta];
         this.novaConta = { nome: '', saldo_inicial: 0 };
         this.showNovaConta = false;
         this.loading = false;
+        window.alert('Conta criada com sucesso!');
       },
       error: (err) => {
         this.error = err?.error?.nome?.[0] || err?.error?.detail || 'Erro ao criar conta.';
