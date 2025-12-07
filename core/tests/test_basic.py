@@ -8,6 +8,7 @@ from datetime import date, timedelta
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.utils import IntegrityError
 from django.utils import timezone
+from django.test import TestCase
 from core.models import (
     Categoria, Conta, Transacao, PerfilAluno, MetaFinanceira
 )

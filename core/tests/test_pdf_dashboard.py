@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date, timedelta
 from decimal import Decimal
-from .models import Conta, Categoria, Transacao, MetaFinanceira, Incentivo
-from .services import gerar_relatorio_financeiro_pdf, obter_dados_dashboard
+from core.models import Conta, Categoria, Transacao, MetaFinanceira, Incentivo
+from core.services import gerar_relatorio_financeiro_pdf, obter_dados_dashboard
 
 
 @pytest.mark.django_db
