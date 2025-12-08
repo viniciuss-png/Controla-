@@ -1,9 +1,15 @@
 # Controlaê - Backend API
 
+```mermaid
+flowchart TD
+    A[Frontend] -->|HTTP / JSON| B[API REST<br/>(Django REST Framework)]
+    B -->|Regras de Negócio| C[Services]
+    C -->|ORM (Django)| D[Banco de Dados]
+
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue)](https://www.python.org/)
 [![Django 5.2.7](https://img.shields.io/badge/Django-5.2.7-darkgreen)](https://www.djangoproject.com/)
 [![DRF 3.16](https://img.shields.io/badge/DRF-3.16-red)](https://www.django-rest-framework.org/)
-()**Controlaê** é uma plataforma de gestão financeira desenvolvida para alunos do ensino médio que recebem o benefício **Pé-de-Meia**. O sistema permite que os beneficiários rastreiem receitas, despesas, contas bancárias e metas de poupança.
+**Controlaê** é uma plataforma de gestão financeira desenvolvida para alunos do ensino médio que recebem o benefício **Pé-de-Meia**. O sistema permite que os beneficiários rastreiem receitas, despesas, contas bancárias e metas de poupança.
 
 # Índice
 
