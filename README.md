@@ -1,8 +1,7 @@
 # Controlaê - Backend API
 
-```mermaid
 flowchart TD
-    A[Frontend] -->|HTTP / JSON| B[API REST<br/>(Django REST Framework)]
+    A[Frontend] -->|HTTP / JSON| B["API REST\n(Django REST Framework)"]
     B -->|Regras de Negócio| C[Services]
     C -->|ORM (Django)| D[Banco de Dados]
 
