@@ -1,10 +1,5 @@
 # Controlaê - Backend API
 
-flowchart TD
-    A[Frontend] -->|HTTP / JSON| B["API REST\n(Django REST Framework)"]
-    B -->|Regras de Negócio| C[Services]
-    C -->|ORM (Django)| D[Banco de Dados]
-
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue)](https://www.python.org/)
 [![Django 5.2.7](https://img.shields.io/badge/Django-5.2.7-darkgreen)](https://www.djangoproject.com/)
 [![DRF 3.16](https://img.shields.io/badge/DRF-3.16-red)](https://www.django-rest-framework.org/)
@@ -1023,11 +1018,7 @@ transacao = Transacao.objects.create(
 )
 ```
 
----
-
-# Segurança
-
-# Boas Práticas Implementadas
+# Segurança e Boas Práticas Implementadas
 
  **Variáveis de Ambiente** - Senhas/chaves não no código  
  **JWT Tokens** - Autenticação stateless e escalável  
@@ -1101,21 +1092,9 @@ def validate_nome(self, value):
 ```
 GitHub Issues: https://github.com/seu-usuario/Backend_Controlae/issues
 ```
-
-### Roadmap Futuro
-- [x] Relatórios PDF
-- [x] Dashboard (API de dados otimizados)
-- [ ] Gráficos interativos no frontend
-- [ ] Notificações de metas
-- [ ] Integração com bancos reais
-- [ ] Mobile app nativo
-- [ ] Dashboard administrativo
-
----
-
 # Autor
 
-**Vinícius** - Desenvolvedor Backend  
+**José Vinícius Cunha da Silva** - Desenvolvedor Backend  
 *Projeto Final - Análise e Desenvolvimento de Sistemas (ADS)*
 
 ---
